@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp&key=WQCBZ-4FF3F-WI4JL-NJGAX-MECTJ-GMFWA"></script>
+	<style>
+     .map{
+     	width: 100%;
+     	height: 400px;
+     }
+	</style>
+</head>
+<body>
+	<div id="map">
+     <qq-map>
+         <qq-map-marker v-bind:places="vueConfCitites"></qq-map-marker>
+     </qq-map>
+	</div>
+	<script>
+
+
+        Vue.component('qq-map',{
+            template:`<div class="map"><slot></slot></div>`,
+        	provide:function(){
+        		return {
+        			getMap:this.getMap
+        		}
+        	},
+        	data:function(){
+        		return {
+        			map:null
+        		}
+        	},
+        	mounted:function(){
+        		this.map=new qq.maps.Map(this.$el, {  
+                              center: new qq.maps.LatLng(39.916527,116.397128),      // 地图的中心地理坐标。
+                               zoom:8                                                 // 地图的中心地理坐标。
+                                    });
+        	},
+        	methods:{
+                 getMap:function(found){
+                 	var vm=this;
+                 	function checkForMap(){
+                 	//	console.log("check");
+                 		if(vm.map){
+                 			found(vm.map)
+                 		}else{
+                 			setTimeout(checkForMap,50)
+                 		}
+                 	}
+                 	checkForMap()
+                 }
+        	}
+        })
+        Vue.component('qq-map-marker',{
+        	inject:['getMap'],
+        	props:['places'],
+        	created:function(){
+        		var vm=this;
+        		vm.getMap(function(map){
+        			vm.places.forEach(function(place){
+        			//	console.log(place.position);
+        				var marker=new qq.maps.LatLng(place.position.lat,place.position.lng);
+        		    new qq.maps.Marker({
+                     position:marker, map:map
+        			})
+        		})
+        	})
+        	},
+         render (h) {
+            return null
+           }
+        })
+        new Vue({
+        	el:'#map',
+        	data:{
+        		vueConfCitites:[
+                   {
+                   	name:'beijing',
+                   	position:{
+                   		lat:40.050930,
+                   		lng:116.610073
+                   	}
+                   },{
+                   	name:'tianjin',
+                   	position:{
+                   		lat:39.100036,
+                   		lng:117.169195
+                   	}
+                   }
+        		]
+        	}
+        })
+    
+	</script>
+</body>
+</html>

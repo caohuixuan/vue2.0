@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+  <style>
+     .active{
+        font-size: 20px;
+     }
+     .textCss{
+      color: #FF0000;
+     }
+     .fade-enter-active, .fade-leave-active {
+      position: absolute;
+  transition: opacity .5s;
+      }
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  position: absolute;
+  opacity: 0;
+}
+.component-fade-enter-active, .component-fade-leave-active {
+  transition: opacity .3s ease;
+}
+.component-fade-enter, .component-fade-leave-to
+/* .component-fade-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+}
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to
+/* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-item {
+  transition: all 1s;
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-complete-enter, .list-complete-leave-to
+/* .list-complete-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+.list-complete-leave-active {
+  position: absolute;
+}
+.tab-button {
+  padding: 6px 10px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background: #f0f0f0;
+  margin-bottom: -1px;
+  margin-right: -1px;
+}
+.tab-button:hover {
+  background: #e0e0e0;
+}
+.tab-button.active {
+  background: #e0e0e0;
+}
+.tab {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+.posts-tab {
+  display: flex;
+}
+.posts-sidebar {
+  max-width: 40vw;
+  margin: 0;
+  padding: 0 10px 0 0;
+  list-style-type: none;
+  border-right: 1px solid #ccc;
+}
+.posts-sidebar li {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  cursor: pointer;
+}
+.posts-sidebar li:hover {
+  background: #eee;
+}
+.posts-sidebar li.selected {
+  background: lightblue;
+}
+.selected-post-container {
+  padding-left: 10px;
+}
+.selected-post > :first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+  </style>
+</head>
+<body>
+<!-- A -->
+	    <!-- 例一：模板语法申明数据，渲染DQOM   语法关键字{{}}-->
+	 <div id="A1">{{msg1}}
+       <p>{{msg2}}</p>
+	 </div>
+	 <script>
+       var A1=new Vue({
+       	el:'#A1',
+       	data:{
+       		msg1:'这是第一个例子通过模板进行Dom渲染',
+       		msg2:'hello World！！'
+       	}
+       });
+	 </script>
+         <!-- 例二：绑定元素特性 语法关键字v-bind:title-->
+         <div id="A2">
+          <span v-bind:title="msg">
+              鼠标悬停即可查看时间
+          </span>
+         </div>
+         <script>
+          var A2=new Vue({
+          	el:'#A2',
+          	data:{
+          		msg:'页面加载于'+new Date().toLocaleString()
+          	}
+          });
+         </script>
+         <!-- 例三：是否显示元素，语法关键字 v-if -->
+         <div id="A3">
+          <p v-if="seen">是否可以看到</p>
+         </div>
+         <script>
+           var A3=new Vue({
+           	el:'#A3',
+           	data:{
+           		seen:true
+           	}
+           });
+         </script>
+         <!-- 例四：展示列表，依次展示 语法关键字：v-for -->
+           <div id="A4">
+           <ul>
+           	<li v-for="list in lists">
+               {{list.text}}
+           	</li>
+           </ul>
+           </div>
+           <script>
+           var A4=new Vue({
+           	el:'#A4',
+           	data:{
+           		lists:[
+                  {text:'abc'},{text:'erw'},{text:'vfsv'}
+           		]
+           	}
+           });
+           </script>
+           <!-- 例五:处理用户输入，进行交互，事件监听，语法关键字：v-on -->
+           <div id="A5">
+            <p>{{msg}}</p>
+            <button v-on:click="resMsg">逆转消息</button>
+           </div>
+           <script>
+             var A5=new Vue({
+             	el:'#A5',
+             	data:{
+             		msg:'Vue'
+             	},
+             	methods:{
+             		resMsg:function(){
+             			this.msg=this.msg.split('').reverse().join('')
+             		}
+             	}
+             });
+           </script>
+           <!-- 例六:通过绑定数据，实现输入数据和展示数据同步，实现数据双向绑定，语法关键字：v-model -->
+           <div id="A6">
+                <p>{{msg}}</p>
+                <input type="text" v-model="msg">
+           </div>
+           <script>
+             var A6=new Vue({
+             	el:'#A6',
+             	data:{
+             		msg:'hello world!!'
+             	}
+             });
+           </script>
+<!-- B -->
+        <!-- 例一：定义组件 -->
+       <!--  
+         <ol id="aa">
+            <Aa></Aa>
+        </ol>
+               <script>
+                Vue.component('Aa', {
+            template: '<li>gfnsjgnfdsjnjdf </li>'
+         })
+                new Vue({
+       el:'aa'
+                })
+               </script> 
+           -->
+          <!--  <div id="B1">
+            <Bb v-bind:B1b="name"></Bb>
+          </div>
+          <script>
+             var B1=new Vue({
+               el:'#B1',
+               data:{
+                 name:'tom'
+               }
+             });
+             Vue.component('Bb',{
+               props:['B1b'],
+               template:'<p>{{B1b}}</p>'
+             })
+          </script> -->
+           <div id="B1">
+           <ul>
+                <Bb v-for="list in lists" v-bind:todo="list" v-bind:key="list.id"></Bb>
+           </ul>
+           </div>
+           <script>
+             Vue.component('Bb',{
+                props:['todo'],
+                template: '<li>{{ todo.text }}</li>'
+
+              })
+              var B1=new Vue({
+                el:'#B1',
+                data:{
+                  lists:[
+                       {id:1,text:'djkasbv'},
+                       {id:2,text:'njdkcnsjk'},
+                       {id:3,text:'vonifov'}
+                  ]
+                }
+              });
+            
+           </script>
+        <!-- 例二：组件数据传输 注意：一定要先声明组件之后再初始化vue-->
+        <div id="B2">
+        <ol>
+           <!--
+             现在我们为每个 todo-item 提供 todo 对象todo 对象是变量，即其内容可以是动态的。我们也需要为每个组件提供一个“key”，稍后再作详细解释。
+              -->
+         <Bb v-for="list in lists" v-bind:todo="list" v-bind:key="list.id"></Bb>
+         </ol>
+         </div>
+         <script>
+            Vue.component('Bb', {
+               props: ['todo'],
+               template: '<li>{{ todo.text }}</li>'
+            })
+            var B2 = new Vue({
+                el: '#B2',
+                data: {
+                      lists: [
+                           { id: 0, text: '蔬菜' },
+                           { id: 1, text: '奶酪' },
+                           { id: 2, text: '随便其它什么人吃的东西' }
+                         ]
+                       }
+                  })
+            
+          </script>
+<!-- C -->
+       <!-- 命令v-once 数据只执行依次，数据改变时不会改变 -->
+       <span v-once id="C1">这个数值不会改变:{{msg}}</span>
+       <script>
+         var C1=new Vue({
+          el:'#C1',
+          data:{
+            msg:'xixi'
+          }
+         })
+       </script>
+       <!-- 命令v-html 将数据读作html 忽略其中的数据绑定 -->
+       <p id="C2">没有使用v-html {{msg}}</p>
+       <p id="C3">使用v-html <span v-html="msg"></span></p>
+        <script>
+         new Vue({
+          el:'#C2',
+          data:{
+            msg:'<span style="color:#FF0000">dsnvn</span>'
+          }
+         })
+         new Vue({
+          el:'#C3',
+          data:{
+            msg:'<span style="color:#FF0000">svds{{mm}}</span>',
+            mm:'cndjkac'
+          }
+         })
+        </script>
+<!-- D -->
+        <!-- 计算属性：computed -->
+        <div id="D1">
+             <p>没有使用计算属性：{{msg}}</p>
+             <p>使用计算属性：{{resMsg}}</p>
+        </div>
+        <script>
+           var D1=new Vue({
+            el:'#D1',
+            data:{
+                msg:'hello'
+            },
+            computed:{
+              resMsg:function(){
+                return this.msg.split('').reverse().join('')
+              }
+            }
+           })
+        </script>
+        <!-- class绑定 -->
+        <div id="D2">
+            <p v-bind:class="{active:isActive,textCss:txtC}">使用对象直接写</p>
+            <p v-bind:class="classObject">调取属性</p>
+            <p v-bind:class="jisuan">使用计算属性</p>
+            <p v-bind:class="[activeClass,text]">使用数组</p>
+        </div>
+        <script>
+              new Vue({
+                el:'#D2',
+                data:{
+                     isActive:true,
+                     txtC:false,
+                     classObject:{
+                     active:true,
+                     textCss:true
+                     },
+                     activeClass:'active',
+                     text:'textCss'
+                },
+                computed:{
+                  jisuan:function(){
+                    return {
+                      active:this.isActive,
+                      textCss:this.txtC
+                    }
+                  }
+                }
+
+              })
+        </script>
+        <!-- style样式绑定 -->
+        <div id="D3">
+            <p v-bind:style="{color:txtColor,fontSize:txtFont}">使用对象绑定</p>
+            <p v-bind:style="txtCss">使用属性</p>
+            <p v-bind:style="txtCom">使用计算属性</p>
+            <p v-bind:style="[txtCss,txtCs]">使用数组</p>
+        </div>
+        <script>
+            new Vue({
+              el:'#D3',
+              data:{
+                txtColor:'red',
+                txtFont:'40px',
+                txtCss:{
+                  color:'red',
+                  fontSize:'40px'
+                },
+                txtCs:{
+                  color:'#FF00FF',
+                  fontSize:'30px'
+                }
+              },
+              computed:{
+                txtCom:function(){
+                  return {color:this.txtColor,fontSize:this.txtFont}
+                }
+              }
+            })
+        </script>
+<!-- E -->
+         <!-- v-if与v-else与else-if -->
+         <div id="E1">
+             <template v-if="ok">
+             <h1>Title</h1>
+             <p>Paragraph 1</p>
+             <p>Paragraph 2</p>
+             </template>
+             <p v-else-if="ko">分支</p>
+             <p v-else>不显示</p>
+         </div>
+         <script>
+            new Vue({
+              el:'#E1',
+              data:{
+                ok:false,
+                ko:true
+              }
+            })
+         </script>
+         <!-- key使元素不可复用 -->
+         <div id="E2">
+            <p>不使用key</p>
+            <template v-if="name">
+                <label>name</label>
+                <input type="text" placeholder="请输入姓名">
+            </template>
+            <template v-else>
+                <label>email</label>
+                <input type="text" placeholder="请输入邮箱">
+            </template>
+            <button v-on:click="change">change</button>
+         </div>
+          <script>
+              new Vue({
+                el:'#E2',
+                data:{
+                  name:true
+                },
+                methods:{
+                  change:function(){
+                      if(this.name){
+                        this.name=false;
+                      }else{
+                        this.name=true;
+                      }
+                  }
+                }
+              })
+          </script>
+          <div id="E3">
+             <p>使用key</p>
+             <template v-if="ok">
+             <label>name</label>
+             <input type="text" placeholder="请输入姓名" key="name">
+             </template>
+             <template v-else>
+             <label>email</label>
+             <input type="text" placeholder="请输入邮箱" key="email">
+             </template>
+             <button v-on:click="change">change</button>
+          </div>
+          <script>
+              new Vue({
+                el:'#E3',
+                data:{
+                  ok:true
+                },
+                methods:{
+                  change:function(){
+                    if(this.ok){
+                      this.ok=false;
+                    }else{
+                      this.ok=true;
+                    }
+                  }
+                }
+              })
+          </script>
+          <!-- v-for -->
+         <ul id="E4">
+          <li v-for="(list,index) in lists" :key="index">
+             {{parent}} >> {{index}} >> {{list.text}}
+          </li>
+        </ul>
+        <script>
+           var E4=new Vue({
+            el:'#E4',
+            data:{
+              parent:'全局',
+              lists:[
+                  {text:'qwe'},
+                  {text:'rty'},
+                  {text:'uio'}
+              ]
+            }
+           })
+        </script> 
+           <ol id="E5">
+               <li v-for="(value,key,index) in object" :key="key">
+                     {{index}}>>{{key}}>>{{value}}
+               </li>
+           </ol>
+           <script>
+               var E5=new Vue({
+                el:'#E5',
+                data:{
+                  object:{
+                    name:'tom',
+                    age:35,
+                    work:'fjsanvjsnaj'
+                  }
+                }
+               })
+           </script>
+        <!-- 显示过滤排序结果 -->
+          <div>
+            <ul id="E6">
+            <li v-for="n in compute">{{n}}</li>
+            </ul>
+            <ul id="E7">
+             <li v-for="n in func(lists)">{{n}}</li>
+            </ul>
+          </div>
+          <script>
+             new Vue({
+              el:'#E6',
+              data:{
+                lists:[1,2,3,4,5,6,7,8,9]
+              },
+              computed:{
+                compute:function(){
+                  return this.lists.filter(function(num){
+                    return num%2==0;
+                  })
+                }
+              }
+             })
+             new Vue({
+              el:'#E7',
+              data:{
+                lists:[1,2,3,4,5,6,7,8,9]
+              },
+              methods:{
+                func:function(lists){
+                 // console.log(this.lists);
+                  return lists.filter(function(num){
+                    return num%2==0;
+                  })
+                }
+              }
+             })
+          </script>
+          <!--  使用v-for获取整数 -->
+             <div id="E8">
+                <span v-for="n in 10">{{n}}</span>
+             </div>
+             <script>
+                 new Vue({
+                      el:'#E8'
+                 })
+             </script>
+<!-- F -->
+                 <!-- 使用v-on进行DOM事件监听 -->
+                 <div id="F1">
+                     <button v-on:click="hello(al,$event)">alert</button>
+                 </div>
+                 <script>
+                     new Vue({
+                      el:'#F1',
+                      data:{
+                        al:'alert'
+                      },
+                      methods:{
+                        hello:function(al,event){
+                          if(event)event.preventDefault();
+                          alert(al+"hello");
+                        }
+                      }
+                     })
+                 </script>
+                <!-- 事件修饰符 -->
+                <div id="F2" v-on:click.self="bySelf()" :style="{width:'300px',height:'300px',backgroundColor:'#cccccc'}">
+                     只能自身触发时触发，而不是内部元素
+                   <p v-on:click.once="once()" :style="{width:'200px',height:'200px',backgroundColor:'#ffffff'}">
+                   只执行一次
+                      <a v-on:click.stop="doThis()" :style="{width:'100px',height:'100px',backgroundColor:'#123456'}">停止继续传播</a>
+                      <button v-on:click.prevent="preVent()">取消默认事件</button>
+                   </p>
+                </div>
+                <script>
+                   new Vue({
+                    el:'#F2',
+                    methods:{
+                      bySelf:function(){
+                        console.log("只能自身触发时触发，而不是内部元素");
+                      },
+                      once:function(){
+                         console.log("只执行一次");
+                      },
+                      doThis:function(){
+                        console.log("停止继续传播");
+                      },
+                      preVent:function(){
+                        console.log("取消默认事件");
+                      }
+                    }
+                   })
+                </script>
+                <!-- 按键修饰符 -->
+                 <div id="F3">
+                   <input type="text" v-on:keyup.enter="byEnter()" placeholder="enter">
+                   <input type="text" v-on:keyup.tab.prevent="byTab()" placeholder="tab">
+                   <input type="text" v-on:keyup.esc="byEsc()" placeholder="esc">
+                 </div>
+                 <script>
+                    new Vue({
+                      el:'#F3',
+                      methods:{
+                        byEnter:function(){
+                          console.log("enter");
+                        },
+                        byTab:function(event){
+                          console.log("tab");
+                        },
+                        byEsc:function(){
+                          console.log("esc");
+                        }
+                      }
+                    })
+                 </script>
+                 <!-- 系统修饰符 -->
+                  <div id="F4">
+                     <input type="text" @keyup.alt.67="altc()" placeholder=" Alt + C">
+                     <button @click.ctrl="CC()">Ctrl + Click</button>
+                     <button @click.ctrl.exact="only()">有且只有 Ctrl 被按下的时候才触发</button>
+                  </div>
+                  <script>
+                      new Vue({
+                        el:'#F4',
+                        methods:{
+                            altc:function(){
+                              console.log("Alt + C");
+                            },
+                            CC:function(){
+                              console.log("Ctrl + Click也可以同时按其他键");
+                            },
+                            only:function(){
+                              console.log("有且只有 Ctrl 被按下的时候才触发");
+                            }
+                        }
+                      })
+                  </script>
+                  <!-- 鼠标按钮修饰符 -->
+                  <div id="F5">
+                      <button v-on:click.right="right()">鼠标右键</button>
+                  </div>
+                  <script>
+                      new Vue({
+                        el:'#F5',
+                        methods:{
+                          right:function(){
+                            console.log("鼠标右键");
+                          }
+                        }
+                      })
+                  </script>
+<!-- M -->
+               <!-- v-model  文本 -->
+               <div id="M1">
+               <input type="text" v-model="msg" placeholder="输入框">
+               <p>文本文字：{{msg}}</p>
+               </div>
+               <script>
+               new Vue({
+                el:'#M1',
+                data:{
+                   msg:''
+                }
+               })
+               </script>
+               <!-- v-model  多行文字 -->
+               <div id="M2">
+                 <p>输入文本为：</p>
+                 <p>{{msg}}</p>
+                 <textarea name="" id="" cols="30" rows="10" v-model="msg" placeholder="输入文本"></textarea>
+               </div>
+               <script>
+                  new Vue({
+                    el:'#M2',
+                    data:{
+                      msg:''
+                    }
+                  })
+               </script>
+              <!--   v-model 复选框 -->
+                   <div id="M3">
+                   <input type="checkbox" id="checkbox" v-model="checked">
+                   <label for="checkbox">{{checked}}</label>
+                   </div>
+                <script>
+                    new  Vue({
+                      el:'#M3',
+                      data:{
+                        checked:true
+                      }
+                    })
+                </script>
+
+                <div id="M4">
+                 <input type="checkbox" id="name" value="name" v-model="checked">
+                 <label for="name">name</label>
+                 <input type="checkbox" id="age" value="age" v-model="checked">
+                 <label for="age">age</label>
+                 <input type="checkbox" id="sex" value="sex" v-model="checked">
+                 <label for="sex">sex</label>
+                 <p>{{checked}}</p>
+                </div>
+                 <script>
+                 new Vue({
+                  el:'#M4',
+                  data:{
+                    checked:["name"]
+                  }
+                 })
+                 </script>
+                 <!-- v-model 单选按钮 -->
+                 <div id="M5">
+                    <input type="radio" id="one" value="one" v-model="num">
+                    <label for="one">one</label>
+                    <input type="radio" id="two" value="two" v-model="num">
+                    <label for="two">two</label>
+                    <p>选择：{{num}}</p>
+                 </div>
+                 <script>
+                     new Vue({
+                      el:'#M5',
+                      data:{
+                        num:''
+                      }
+                     })
+                 </script>
+                 <!-- v-model  选择框 -->
+                 <div id="M6">
+                   <select v-model="selected">
+                     <option disabled value="">请选择</option>
+                     <option value="A">A</option>
+                     <option value="B">B</option>
+                     <option value="C">C</option>
+                   </select>
+                   <span>选择：{{selected}}</span>
+                </div>
+                <script>
+                   new Vue({
+                     el:'#M6',
+                     data:{
+                       selected:''
+                     }
+                   })
+                </script> 
+               <!--  如果 v-model 表达式的初始值未能匹配任何选项，<select> 元素将被渲染为“未选中”状态。在 iOS 中，这会使用户无法选择第一个选项。因为这样的情况下，iOS 不会触发 change 事件。因此，更推荐像上面这样提供一个值为空的禁用选项。-->
+                <div id="M7">
+                    <select name="" id="" v-model="selected" multiple style="width: 100px">
+                     <option value="A">A</option>
+                     <option value="B">B</option>
+                     <option value="C">C</option>
+                    </select>
+                    <p>选择：{{selected}}</p>
+                </div>
+                <script>
+                    new Vue({
+                      el:'#M7',
+                      data:{
+                        selected:[]
+                      }
+                    })
+                </script>
+                <div id="M8">
+                  <select name="" id="" v-model="selected">
+                     <option v-for="option in options" v-bind:value="option.value">{{option.text}}</option>
+                  </select>
+                  <p>选择：{{selected}}</p>
+                </div>
+                <script>
+                   new Vue({
+                    el:'#M8',
+                    data:{
+                      selected:'one',
+                      options:[
+                          {text:'A',value:'one'},
+                          {text:'B',value:'two'},
+                          {text:'C',value:'three'}
+                      ]
+                    }
+                   })
+                </script>
+                <!-- v-model 复选框自定义设置是否值 -->
+                <div id="M9">
+                <input id="select" type="checkbox" v-model="selected" true-value="yes" false-value="no">
+                <label for="select">{{selected}}</label>
+                </div>
+                <script>
+                    new Vue({
+                      el:'#M9',
+                      data:{
+                        selected:'yes'
+                      }
+
+                    })
+                </script>
+                <!-- 修饰符：.lazy -->
+                <div id="M10">
+                <input id="msg" type="text" v-model.lazy="msg">
+                <label for="msg">{{msg}}</label>
+                </div>
+                <script>
+                    new Vue({
+                      el:'#M10',
+                      data:{
+                        msg:''
+                      }
+                    })
+                </script>
+                <!-- 修饰符：number -->
+                 <div id="M11">
+                    <input id="msg" type="text" v-model.number="age" type="number">
+                    <label for="msg">{{age}}</label>
+                 </div>
+                 <script>
+                    new Vue({
+                      el:'#M11',
+                      data:{
+                        age:13
+                      }
+                    })
+                 </script>
+                 <!-- 修饰符：trim -->
+                 <div id="M12">
+                     <input type="text" id="msg" v-model.trim="msg">
+                     <label for="msg">==={{msg}}===</label>
+                 </div>
+                 <script>
+                     new Vue({
+                      el:'#M12',
+                      data:{
+                        msg:''
+                      }
+                     })
+                 </script>
+<!-- G -->
+                 <!-- 注册全局组件 -->
+                 <div id="G1">
+                      <a-component></a-component>
+                 </div>
+                <script>
+                   Vue.component('a-component',{
+                    template:'<p>这是一个全局组件</p>'
+                   });
+                   new Vue({
+                    el:'#G1',
+                   })
+                </script>
+                <!-- 注册局部组件 -->
+                <div id="G2">
+                    <b-component></b-component>
+                </div>
+                <script>
+                       var child={template:'<div>这是一个局部组件</div>'}
+                       new Vue({
+                        el:'#G2',
+                        components:{
+                          'b-component':child
+                        }
+                       })
+                </script>
+                <!-- 组件data选项必须是函数 -->
+                <div id="G3">
+                    <c-component></c-component>
+                    <c-component></c-component>
+                    <c-component></c-component>
+                </div>
+                <script>
+                    Vue.component('c-component',{
+                      template:'<button v-on:click="count+=1">{{count}}</button>',
+                      data:function(){
+                        return {count:0}
+                      }
+                    })
+                    new Vue({
+                      el:'#G3'
+                    })
+                </script>
+                <!-- props选项声明 -->
+                <div id="G4">
+                  <d-component msg="hello"></d-component>
+                </div>
+                <script>
+                  Vue.component('d-component',{
+                      props:['msg'],
+                      template:'<span>{{msg}}</span>'
+                  })
+                  new Vue({
+                    el:'#G4'
+                  })
+                </script>
+                <!-- 动态props -->
+                <div id="G5">
+                   <input type="text" v-model="msg">
+                   <e-component :this-msg="msg"></e-component>
+                </div>
+                <script>
+                    Vue.component('e-component',{
+                      props:['thisMsg'],
+                      template:'<p>{{thisMsg}}</p>'
+                     })
+                    new Vue({
+                    el:'#G5',
+                    data:{
+                      msg:'cmanc'
+                    }
+                  })
+                </script>
+                <!-- 子组件对prop的使用  当作局部数据-->
+                <div id="G6">
+                      <f-component :e-msg="msg"></f-component>
+                </div>
+                <script>
+                    Vue.component('f-component',{
+                      props:['eMsg'],
+                      template:'<p>{{message}}</p>',
+                      data:function(){
+                        return {message:this.eMsg}
+                      }
+                    })
+                    new Vue({
+                       el:'#G6',
+                       data:{
+                        msg:'abDc'
+                       }
+                    })
+                </script>
+                <!-- 子组件对prop的使用  由子组件处理成其它数据输出-->
+                <div id="G7">
+                    <input type="text" v-model="msg">
+                    <g-component :f-msg="msg"></g-component>
+                </div>
+                <script>
+                   Vue.component('g-component',{
+                    props:['fMsg'],
+                    template:'<span>vnjvn{{commsg}}</span>',
+                    computed:{
+                      commsg:function(){
+                        return this.fMsg+"===";
+                      }
+                    }
+                   })
+                   new Vue({
+                    el:'#G7',
+                    data:{
+                      msg:''
+                    }
+                   }) 
+                </script>
+                <!-- 自定义组件，事件监听 -->
+                  <div id="G9">
+           <p>{{total}}</p>
+           <i-component v-on:parent='parentFunc'></i-component>
+            <i-component v-on:parent='parentFunc'></i-component>
+    </div>
+                 <script>
+                     Vue.component('i-component',{
+                         template:'<button v-on:click="jiajia">{{count}}</button>',
+                         data:function(){
+                          return {count:0};
+                         },
+                         methods: {
+                          jiajia: function () {
+                           this.count += 1
+                         this.$emit('parent')
+                         }
+                         },
+                     })
+                     new Vue({
+                      el:'#G9',
+                      data:{
+                        total:0
+                      },
+                      methods:{
+                        parentFunc:function () {
+                             this.total += 1
+                         }
+                      }
+                     })
+                 </script>
+                 <!-- 载荷数据 -->
+
+                 <div id="G10">
+                   <p v-for="mag in messages">{{mag}}</p>
+                   <j-component v-on:message="listMessage"></j-component>
+                 </div>
+                 <script>
+                   Vue.component('j-component',{
+                       template:'<div><input type="text" v-model="msg" placeholder="默认值" /><button v-on:click="addMessage">增加</button></div>',
+                       data:function(){
+                        return {msg:''};
+                       },
+                       methods:{
+                        addMessage:function(){
+                          this.$emit('message',{message:this.msg})
+                        }
+                       }
+                   })
+                   new Vue({
+                    el:'#G10',
+                    data:{messages:[]},
+                    methods:{
+                       listMessage:function(mm){
+                             this.messages.push(mm.message)
+                       }
+                    }
+                   })
+                 </script>
+                 <!-- 使用自定义事件的表单输入事件 -->
+                 <div id="G11">
+                      <k-component v-model="price"></k-component>
+                 </div>
+                 <script>
+                     Vue.component('k-component',{
+                       template:'\
+                           <span>\
+                           $\
+                           <input\
+                           ref="input"\
+                           v-bind:value="value"\
+                           v-on:input="updateValue($event.target.value)"\
+                           >\
+                           </span>\
+                       ',
+                       props:['value'],
+                       methods:{
+                         updateValue:function(value){
+                          //删除左右空格并保留两位小数
+                             var formattedValue=value.trim().slice(
+                                 0,
+                                 value.indexOf('.')===-1?value.length:value.indexOf('.')+3
+                              );
+                             if(formattedValue!==value){
+                              this.$refs.input.value=formattedValue;
+                             }
+                             this.$emit('input',Number(formattedValue))
+                         },
+                       }
+                     })
+                     new Vue({
+                      el:'#G11',
+                      data:{
+                        price:0.00
+                      }
+                     })
+                 </script>
+                <!--  单个插槽 -->
+                <div id="G12">
+                   <p>这是父组件的标题</p>
+                   <l-component>
+                       <p>这是代替插槽的内容</p>
+                       <p>这是代替插槽的内容</p>
+                   </l-component>
+                </div>
+                <script>
+                  Vue.component('l-component',{
+                    template:'<div>\
+                    <p>这是子组件的标题</p>\
+                    <slot>\
+                    这是一个插槽，当没有分发的内容才会显示\
+                    </slot>\
+                    '
+                  })
+                  new Vue({
+                    el:'#G12'
+                  })
+                </script>
+                <!-- 具名插槽 -->
+                <div id="G13">
+                   <p>这是父组件的标题</p>
+                   <m-component>
+                       <p slot="header">这是头信息</p>
+                       <p>这是主要内容</p>
+                       <p>这是主要内容1</p>
+                       <p slot="footer">这是底部</p>
+                   </m-component>
+                </div>
+                <script>
+                  Vue.component('m-component',{
+                    template:'<div>\
+                      <header><slot name="header"></slot></header>\
+                      <main><slot></slot></main>\
+                      <footer><slot name="footer"></slot></footer>\
+                    </div>'
+                  })
+                  new Vue({
+                    el:'#G13'
+                  })
+                </script>
+                <!-- 作用域插槽 -->
+                <hr />
+                <div id="G14">
+                <p>这是父组件1</p>
+                    <n-component>
+                        <template slot-scope="props">
+                       <p>这个是作用域插槽，用来传递数据</p>
+                       <p>{{ props.text }}</p>
+                       </template>
+                    </n-component>
+                </div>
+                <script>
+                  Vue.component('n-component',{
+                    template:'<div><slot text="hello from child"></slot></div>'
+                  })
+   
+                  new Vue({
+                    el:'#G14'
+                  })
+                </script>
+             <!--    作用域插槽2.5.0+  -->
+                <div id="G15">
+                  <o-component>
+                     <li slot="item" slot-scope="props">{{props.text}}</li>
+                  </o-component>
+                </div>
+
+                <script>
+               Vue.component('o-component',{
+                template:'<ul><slot name="item" v-for="item in items" :text="item.text"></slot></ul>',
+                data:function(){
+                  return {
+                    items:[
+                       {text:"fbjakf"},
+                       {text:"ndjkcbsv"},
+                       {text:"vbdhskvb"}
+                    ]
+                }
+                }
+               })
+               new Vue({
+                el:'#G15'
+               })
+                  </script>
+                <!-- 动态组件 -->
+                <div id="G16">
+                      <input type="radio" id="first" value="first" v-model="choseType"><label for="first">first</label>
+                      <input type="radio" id="second" value="second" v-model="choseType"><label for="second">second</label>
+                      <input type="radio" id="third" value="third" v-model="choseType"><label for="third">third</label>
+                     <p-component v-bind:is="choseType"></p-component>
+                </div>
+                <script>
+                    new Vue({
+                      el:'#G16',
+                      data:{
+                        choseType:'first'
+                      },
+                      components:{
+                        first:{template:'<p>这是第一个</p>'},
+                        second:{template:'<p>这是第二个</p>'},
+                         third:{template:'<p>这是第三个</p>'}
+                      }
+                    })
+                </script>
+<!-- H -->
+         <!--  组件的过渡效果 transition -->
+         <div id="H1">
+            <button v-on:click="show=!show">change</button>
+            <transition name="fade">
+               <p v-if="show">内容</p>
+            </transition>
+         </div>
+         <script>
+            new Vue({
+              el:'#H1',
+              data:{
+                show:true
+              }
+            })
+         </script>
+        <!-- 组件的过渡效果 使用animation -->
+        <div id="H2">
+            <button v-on:click="show=!show">按钮</button>
+            <transition name="bounce">
+              <p v-if="show">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis enim libero, at lacinia diam fermentum id. Pellentesque habitant morbi tristique senectus et netus.</p>
+            </transition>
+        </div>
+        <script>
+           new Vue({
+            el:'#H2',
+            data:{
+              show:true
+            }
+           })
+        </script>
+       <!--  自定义过渡类名  结合第三方动画库-->
+          <div id="H3">
+            <button v-on:click="show=!show">按钮+第三方动画库</button>
+            <transition name="waibucss-transition" enter-active-class="animated tada" leave-active-class="animated bounceOutRight">
+               <p v-if="show">hello</p>
+            </transition>
+          </div>
+          <script>
+             new Vue({
+              el:'#H3',
+              data:{
+                show:true
+              }
+             })
+          </script>
+          <!-- 使用JS进行过渡   结合Velocity.js -->
+          <div id="H4">
+             <button v-on:click="show=!show">使用JS进行过渡+Velocity.js</button>
+             <transition v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:leave="leave" v-bind:css="false">
+               <p v-if="show">使用JS实现过渡</p> 
+             </transition>
+          </div>
+          <script>
+            new Vue({
+              el:'#H4',
+              data:{
+                show:false
+              },
+              methods:{
+                beforeEnter:function(el){
+                    el.style.opacity=0;
+                    el.style.transformOrigin='left';
+                },
+                enter:function(el,done){
+                     Velocity(el,{opacity:1,fontSize:'1.4em'},{duration:300})
+                     Velocity(el,{fontSize:'1em'},{complete:done})
+                },
+                leave:function(el,done){
+                   Velocity(el, { translateX: '15px', rotateZ: '50deg' }, { duration: 600 })
+                   Velocity(el, { rotateZ: '100deg' }, { loop: 2 })
+                   Velocity(el, {
+                     rotateZ: '45deg',
+                     translateY: '30px',
+                     translateX: '30px',
+                     opacity: 0
+                     }, { complete: done })
+                }
+              }
+            })
+          </script>
+          <!-- 多个元素的过渡 -->
+          <div id="H5">
+            <div>
+            <input type="text" v-model="one">
+               <transition name="fade" mode="out-in">
+                   <button v-if="one=='save'" key="save" v-on:click="one='edited'">save</button>
+                   <button v-if="one=='edited'" key="edited">edited</button>
+                   <button v-if="one=='reset'" key="reset">reset</button>
+                   <button v-else="one==''" key="kong">kong</button>
+               </transition>  
+            </div>
+            <div>
+                 <input type="text" v-model="two">
+                <transition name="fade" mode="in-out">
+                   <button v-bind:key="two">
+                      {{twoNum}}
+                   </button>
+                </transition>
+            </div>
+          </div>
+          <script>
+             new Vue({
+              el:'#H5',
+              data:{
+                one:'',
+                two:''
+              },
+              computed:{
+                twoNum:function(){
+                switch(this.two){
+                  case "qwe":return "qwe";
+                  case "rty":return "rty";
+                  case "uio":return "uio";
+                  default: return "asd";
+                }
+              }
+            }
+             })
+          </script>
+          <!-- 多个组件的过渡 -->
+          <div id="H6">
+             <input type="radio" id="one" value="one" v-model="num">
+             <label for="one">one</label>
+             <input type="radio" id="two" value="two" v-model="num">
+             <label for="two">two</label>
+             <transition name="component-fade" mode="out-in">
+               <p-component v-bind:is="num"></p-component>
+             </transition>
+          </div>
+          <script>
+                new Vue({
+                  el:'#H6',
+                  data:{
+                    num:'one'
+                  },
+                  components:{
+                    'one':{
+                      template:'<div>one</div>'
+                    },
+                    'two':{
+                      template:'<div>two</div>'
+                    }
+                  }
+                })
+          </script>
+             <!-- 列表过渡1 -->
+             <div id="H7">
+              <button v-on:click="add">add</button>   
+              <button v-on:click="remove">remove</button>
+              <transition-group name="list" tag="p">
+                   <span v-for="item in items" v-bind:key="item" class="list-item">
+                      {{item}}
+                   </span>
+              </transition-group>
+          </div> 
+          <script>
+              new Vue({
+                el:'#H7',
+                data:{
+                  items:[1,2,3,4,5,6,7,8,9],
+                  nextNum:10
+                },
+                methods:{
+                  randomIndex:function(){
+                    return Math.floor(Math.random()*this.items.length);
+                  },
+                  add:function(){
+                    this.items.splice(this.randomIndex(),0,this.nextNum++);
+                  },
+                  remove:function(){
+                    this.items.splice(this.randomIndex(),1)
+                  }
+                }
+              })
+          </script>  
+             <!-- 列表过渡2 -->
+          <div id="H8">
+          <button v-on:click="shuffle">Shuffle</button>
+              <button v-on:click="add">add</button>   
+              <button v-on:click="remove">remove</button>
+              <transition-group name="list-complete" tag="p">
+                   <span v-for="item in items" v-bind:key="item" class="list-complete-item">
+                      {{item}}
+                   </span>
+              </transition-group>
+          </div> 
+          <script>
+              new Vue({
+                el:'#H8',
+                data:{
+                  items:[1,2,3,4,5,6,7,8,9],
+                  nextNum:10
+                },
+                methods:{
+                  randomIndex:function(){
+                    return Math.floor(Math.random()*this.items.length);
+                  },
+                  shuffle: function () {
+                    this.items = _.shuffle(this.items)
+                    },
+                  add:function(){
+                    this.items.splice(this.randomIndex(),0,this.nextNum++);
+                  },
+                  remove:function(){
+                    this.items.splice(this.randomIndex(),1)
+                  }
+                }
+              })
+          </script>  
+          <!-- 列表的交错过渡 -->
+          <div id="H9">
+              <input type="text" v-model="text">
+              <transition-group name="staggered-fade" tag="ul" v-bind:css="false" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:leave="leave">
+                 <li v-for="(item,index) in itemsList" v-bind:key="item.msg" v-bind:data-index="index">
+                      {{item.msg}}
+                 </li>
+              </transition-group>
+          </div>
+          <script>
+              new Vue({
+                el:'#H9',
+                data:{
+                  text:'',
+                  items:[
+                      { msg: 'Bruce Lee' },
+                      { msg: 'Jackie Chan' },
+                      { msg: 'Chuck Norris' },
+                      { msg: 'Jet Li' },
+                      { msg: 'Kung Fury' }
+                  ]
+                },
+                computed:{
+                    itemsList:function(){
+                      var vm=this;
+                      return this.items.filter(function(item){
+                        return item.msg.toLowerCase().indexOf(vm.text.toLowerCase())!==-1;
+                      })
+                    }
+                },
+                methods:{
+                   beforeEnter: function (el) {
+                         el.style.opacity = 0
+                         el.style.height = 0
+                       },
+                   enter: function (el, done) {
+                         var delay = el.dataset.index * 150
+                          setTimeout(function () {
+                           Velocity(
+                             el,
+                             { opacity: 1, height: '1.6em' },
+                             { complete: done }
+                           )
+                         }, delay)
+                        },
+                   leave: function (el, done) {
+                          var delay = el.dataset.index * 150
+                           setTimeout(function () {
+                           Velocity(
+                             el,
+                             { opacity: 0, height: 0 },
+                              { complete: done }
+                           )
+                          }, delay)
+                       }
+                   }
+                                 })
+          </script>
+            <!-- 状态过渡 -->
+            <div id="H10">
+              <input type="number" v-model.number="number" step="20">
+              <p>{{numberSew}}</p>
+            </div>
+            <script>
+                new Vue({
+                  el:'#H10',
+                  data:{
+                    number:0,
+                    numberM:0
+                  },
+                  computed:{
+                     numberSew:function(){
+                      return this.numberM.toFixed(0);
+                     }
+                  },
+                  watch:{
+                     number:function(newNumber){
+                      TweenLite.to(this.$data,0.5,{numberM:newNumber});
+                     }
+                  }
+                })
+            </script>
+              <!-- 放在组件里面的过渡 -->
+   <div id="H11">
+  <input v-model.number="firstNumber" type="number" step="20"> +
+  <input v-model.number="secondNumber" type="number" step="20"> =
+  {{ result }}
+  <p>
+    <animated-integer v-bind:value="firstNumber"></animated-integer> +
+    <animated-integer v-bind:value="secondNumber"></animated-integer> =
+    <animated-integer v-bind:value="result"></animated-integer>
+  </p>
+</div>
+              <script>
+                   Vue.component('animated-integer', {
+  template: '<span>{{ tweeningValue }}</span>',
+  props: ["value"],
+  data: function () {
+    return {
+      tweeningValue: 0
+    }
+  },
+  watch: {
+    value: function (newValue, oldValue) {
+      this.tween(oldValue, newValue)
+    }
+  },
+  mounted: function () {
+    this.tween(0, this.value)
+  },
+  methods: {
+    tween: function (startValue, endValue) {
+      var vm = this
+      function animate () {
+        if (TWEEN.update()) {
+          requestAnimationFrame(animate)
+        }
+      }
+
+      new TWEEN.Tween({ tweeningValue: startValue })
+        .to({ tweeningValue: endValue }, 500)
+        .onUpdate(function (event) {
+          //console.log(event);event.tweeningValue.toFixed(0)
+          vm.tweeningValue =vm.value.toFixed(0);
+        })
+        .start()
+
+      animate()
+    }
+  }
+})
+
+// 所有的复杂度都已经从 Vue 的主实例中移除！
+new Vue({
+  el: '#H11',
+  data: {
+    firstNumber: 20,
+    secondNumber: 40
+  },
+  computed: {
+    result: function () {
+      return this.firstNumber + this.secondNumber
+    }
+  }
+})
+              </script>
+<!-- I -->
+          <!-- 数据对象混入合并 -->
+          <script>
+              var shuju={
+                data:function(){
+                  return {
+                    msg:"数据对象",
+                    foo:"混入合并"
+                  };
+                }
+              };
+              new Vue({
+                mixins:[shuju],
+                data:function(){
+                  return {
+                    msg:"组件数据",
+                    foo:"zujianshuju"
+                  };
+                },
+                created:function(){
+                  console.log(this.$data.msg);
+                   console.log(this.$data.foo);
+                }
+              })
+          </script>
+          <!-- 同名钩子混合 -->
+          <script>
+            var gouzi={
+              created:function(){
+                console.log("混入对象钩子");
+              }
+            };
+            new Vue({
+              mixins:[gouzi],
+              created:function(){
+                console.log("组件钩子");
+              }
+            })
+          </script>
+               <!-- 值为对象的混合 -->
+               <script>
+              var duixiang={
+                methods:{
+                  aa:function(){
+                    console.log("值为对象的混合对象");
+                  }
+                }
+              };
+             var I=new Vue({
+                mixins:[duixiang],
+                methods:{
+                  aa:function(){
+                    console.log("组件的方法");
+                  }
+                }
+              })
+                I.aa();
+               </script>
+              <!-- 全局混入 -->
+              <script>
+                 Vue.mixin({
+                  created:function(){
+                    var quanju=this.$options.quanju;
+                    if(quanju){
+                      console.log(quanju);
+                    } 
+                  }
+                 })
+                 new Vue({
+                  quanju:'全局混入，自定义选项'
+                 })
+              </script>
+<!-- J -->
+              <!-- 全局注册自定义指令 -->
+              <div id="J1">
+                <input type="text" v-focus>
+              </div>
+              <script>
+                 Vue.directive('focus',{
+                  inserted:function(el){
+                    el.focus();
+                  }
+                 })
+                 new Vue({
+                  el:'#J1'
+                 })
+              </script>
+              <!-- 局部指令注册 -->
+              <div id="J2">
+                  <div v-change-color>局部指令注册</div>
+              </div>
+              <script>
+                  new Vue({
+                    el:'#J2',
+                    directives:{
+                      changeColor:{
+                        inserted:function(el){
+                          el.style.backgroundColor="#FF0000";
+                        }
+                      }
+                    }
+                  })
+              </script>
+              <!-- 自定义指令+钩子函数 -->
+              <div id="J3">
+                <div v-abc:foo.a.b="msg"></div>
+              </div>
+              <script>
+                 Vue.directive('abc',{
+                  bind:function(el,binding,vnode){
+                      var s=JSON.stringify;
+                      el.innerHTML=
+                         'name'+s(binding.name)+"<br>"+
+                          'value'+s(binding.value)+"<br>"+
+                           'expression'+s(binding.expression)+"<br>"+
+                            'argument'+s(binding.arg)+"<br>"+
+                             'modifiers'+s(binding.modifiers)+"<br>"+
+                             'vnode keys-----'+Object.keys(vnode).join(',');
+                  }
+                 })
+                 new Vue({
+                  el:'#J3',
+                  data:{
+                    msg:'message'
+                  }
+                 })
+              </script>
+              <!-- 钩子简写 -->
+              <div style="width: 100px;height: 100px;" id="J4" v-color-change="red"></div>
+              <script>
+                   Vue.directive('color-change',function(el,binding){
+                          el.style.backgroundColor=binding.value;
+                   })
+                   new Vue({
+                    el:'#J4',
+                    data:{
+                      red:'#FF0000'
+                    }
+                   })
+              </script>
+              <div id="J5">
+                  <input type="text" v-model="color">
+                  <div style="height: 100px;width: 100px;" v-changecolor="comcolor"></div>
+              </div>
+              <script>
+                  Vue.directive('changecolor',function(el,binding){
+                 el.style.backgroundColor=binding.value;
+                  })
+                  new Vue({
+                    el:'#J5',
+                    data:{
+                      color:'red'
+                    },
+                    computed:{
+                      comcolor:function(){
+                        switch(this.color){
+                          case 'red':return "#FF0000";
+                          case 'green':return "#00FF00";
+                          case 'blue':return "#0000FF";
+                        }
+                      }
+                    }
+                  })
+              </script>
+               <!-- 对象字面量 -->
+               <div id="J6" v-message="{ color: 'white', text: 'hello!' }"></div>
+               <script>
+                  Vue.directive('message',function(el,binding){
+                    console.log(binding.value.color);
+                    console.log(binding.value.text);
+                  })
+                  new Vue({
+                    el:'#J6'
+                  })
+               </script>
+<!-- K -->
+              <div id="K1">
+              <input type="text" v-model="num">
+                  <p-component :level="num">hello world</p-component>
+              </div>
+              <script>
+                  Vue.component('p-component',{
+                    render:function(createElement){
+                      return createElement('h'+this.level,this.$slots.default)
+                    },
+                    props:{
+                      level:{
+                        type:Number,
+                        required:true
+                      }
+                    }
+                  })
+                  new Vue({
+                    el:'#K1',
+                    data:{
+                      num:1
+                    }
+                  })
+              </script>
+              <div id="K2">
+                 <q-component>
+                    <h1 slot="header">这是标题</h1>
+                    <p>Here's some page content, which will be included in vm.$slots.default, because it's not inside a named slot.</p>
+                    <p slot="footer">这是尾部</p>
+                    <p>If I have some content down here, it will also be included in vm.$slots.default.</p>
+                 </q-component>
+              </div>
+              <script>
+                Vue.component('q-component',{
+                  render:function(createElement){
+                    var header=this.$slots.header;
+                    var body=this.$slots.default;
+                    var footer=this.$slots.footer;
+                    return createElement('div',[
+                         createElement('header',header),
+                         createElement('body',body),
+                         createElement('footer',footer)
+                      ])
+                  }
+                })
+                new Vue({
+                  el:'#K2'
+                })
+              </script>
+            <!-- 节点+虚拟DOM -->
+            <div id="K3">
+                <r-component :level="1">
+                       <p>abc</p>
+                      <p>EWQ23</p>
+                </r-component>
+            </div>
+            <script>
+                var getChildrenText=function(children){
+                  return children.map(function(node){
+                    return node.children?getChildrenText(node.children):node.text
+                  }).join('')
+                };
+                Vue.component('r-component',{
+                  render:function(createElement){
+                    var headingId = getChildrenText(this.$slots.default) .toLowerCase().replace(/\W+/g, '-').replace(/(^\-|\-$)/g, '');
+                    return createElement('h'+this.level,[
+                         createElement('a',{
+                          attrs:{
+                            name:headingId,
+                            href:'#'+headingId
+                          },
+                           on: {
+                           click: function(){
+                            alert(this.name);//无法弹出内容
+                           }
+                          },
+                         },this.$slots.default)
+                      ])
+                  },
+                  props:{
+                    level:{
+                      type:Number,
+                      required:true
+                    }
+                  }
+                })
+                new Vue({
+                  el:'#K3'
+                })
+            </script>
+            <!-- 使用js代替模板v-if v-for -->
+            <div id="K4">
+                <s-component :items="itemsList"></s-component>
+            </div>
+            <script>
+                  Vue.component('s-component',{
+                    render:function(createElement){
+                          if(this.items.length){
+                            return createElement('ul',this.items.map(function(item){
+                              return createElement('li',item.name);
+                            }));
+                          }else{
+                            return createElement('p','没有列表信息');
+                          }
+                    },
+                    props:['items']
+                  })
+                  new Vue({
+                    el:'#K4',
+                    data:{
+                      itemsList:[
+                          {name:'cnja'},
+                          {name:'sdlvnds'},
+                          {name:'njdksvnjksdbvuji'}
+                      ]
+                    }
+                  })
+            </script>
+              <!-- 使用js代替模板v-model -->
+               <div id="K5">
+                  <p>{{msg}}</p>
+                   <t-component :message="msg" v-on:input="changeMsg"></t-component>
+               </div>
+               <script>
+                   Vue.component('t-component',{
+                    render:function(createElement){
+                         var me=this;
+                          return createElement('input',{
+                            domProps:{
+                              value:me.message
+                            },
+                            on:{
+                              input:function(event){
+                                console.log("a");
+                                me.$emit('input',event.target.value)
+                              }
+                            }
+                          }); 
+                    },
+                    props:['message']
+                   })
+                   new Vue({
+                    el:'#K5',
+                    data:{
+                      msg:'vsnv'
+                    },
+                    methods:{
+                      changeMsg:function(message){
+                        this.msg=message;
+                      }
+                    }
+                   })
+               </script>
+               <!-- 作用域插槽 this.$scopedSlots -->
+               <div id="K6">
+                    <u-component>
+                    <template slot-scope="props">
+                            <p>作用域插槽1</p>
+                            <p>{{props.text}}</p>
+                    </template>
+                    </u-component>
+               </div>
+               <script>
+               Vue.component('u-component',{
+                render:function(createElement){
+                    return createElement('div',[
+                      this.$scopedSlots.default({
+                          text:this.msg
+                      })
+                      ]);
+                },
+                data:function(){
+                  return {msg:"nvjs"}
+                }
+               })
+                   new Vue({
+                    el:'#K6'
+                   })
+               </script>
+               <div id="K7">
+                    <u-component>
+                    <template slot-scope="props">
+                    <p>作用域插槽2</p>
+                            {{props.text}}
+                    </template>
+                    </u-component>
+               </div>
+               <script>
+               Vue.component('u-component',{
+               render: function (createElement) {
+              return createElement('div', [
+                 createElement('child', {
+                      scopedSlots: {
+                   default: function (props) {
+                      return createElement('span', props.text)
+                       }
+                        }
+                  })
+                ])
+                  },
+                  data:function(){
+                  return {text:"nvjs"}
+                },
+                props:["text"]
+               })
+                   new Vue({
+                    el:'#K7',
+                     data:{
+                      text:"csnkcnk"
+                     }
+                   })
+               </script>
+               <!-- 函数式组件 -->
+              <div id="K8">
+                <v-component :item="list" :isOrdered="lieu">这是输出</v-component>
+              </div>
+              <script>
+              var shuchu1="h1";
+              var shuchu2="h2";
+              var shuchu3="h3";
+              var shuchu4="h6";
+              Vue.component('v-component',{
+                functional:true,
+                render:function(createElement,context){
+                  function adddoc(){
+                       var items=context.props.item;
+                       if(items.length===0)return shuchu1;
+                       if(typeof items[0]==='object')return shuchu2;
+                       if(context.props.isOrdered)return shuchu3;
+                        return shuchu4;
+                  }
+                  return createElement(adddoc(),context.data,context.children)
+                },
+                props:{
+                  item:{
+                    type:Array,
+                    required:true
+                  },
+                  isOrdered:Boolean
+                }
+              })
+
+               new Vue({
+                el:'#K8',
+                data:{
+                  list:["123","123","123"],
+                  lieu:true
+                }
+               })
+              </script>
+              <hr>
+<!--  L -->
+          <!-- 自定义过滤器 -->
+          <div id="L1">
+               <input type="text" v-model="msg">
+               <p>{{msg|toUp}}</p>
+               <input type="text" v-bind:value="msg|toUp">
+          </div>
+          <script>
+              Vue.filter('toUp',function(value){
+                if(!value)return '';
+                value=value.toString();
+                return value.charAt(0).toUpperCase()+value.slice(1)
+              })
+              new Vue({
+                el:'#L1',
+                data:{
+                  msg:'fdsf'
+                }
+              })
+          </script>
+<!-- M -->
+         <!-- 动态组件 -->
+           <div id="L2">
+                <button v-for="tab in tabs" v-bind:key="tab" v-on:click="current=tab">{{tab}}</button>
+             <keep-alive>
+                 <component v-bind:is="currentTab" class="tab"></component>
+             </keep-alive> 
+           </div>
+           <script>
+           Vue.component('tab-post',{
+            data:function(){
+              return{
+              posts:[
+                  {
+                    id:'1',
+                    title:'one',
+                    content:'这是第一个'
+                  },
+                  {
+                    id:'2',
+                    title:'two',
+                    content:'这是第二个'
+                  },
+                  {
+                    id:'3',
+                    title:'three',
+                    content:'这是第三个'
+                  }
+              ],
+              contenttext:null
+              }
+            },
+          template:`<div class="posts-tab">
+                   <ul class="posts-sidebar">
+                   <li v-for="post in posts" v-bind:key="post.id" v-on:click="contenttext=post">{{post.title}}</li>
+                   </ul>
+                   <div class="selected-post-container">
+                       <div v-if="contenttext" class="selected-post">
+                         <h3>{{contenttext.title}}</h3>
+                         <p v-html="contenttext.content"></p>
+                       </div>
+                       <div v-else>请点击左侧列表</div>
+                   </div>
+            </div>`
+           })
+           Vue.component('tab-achive',{
+            template:'<div>tab-achive</div>'
+           })
+            new Vue({
+                el:'#L2',
+                data:{
+                    current:'post',
+                    tabs:['post','achive']
+                },
+                computed:{
+                     currentTab:function(){
+                      return 'tab-'+this.current
+                     }
+                }
+              })
+           </script>
+           <!-- $ref -->
+           <div id="L3">
+         
+                <input type="text" ref="uernameInput">   
+              
+               <button @click="focus">fouce</button>
+           </div>
+           <script>
+            Vue.component('ref-component',{
+              template:`<div>
+                        <h3>这是ref特性</h3>
+                        <slot name="aa"></slot>
+                        <br />
+                  </div>`,
+              methods:{
+                focus:function(){
+                this.$refs.uernameInput.focus()
+                }
+              }
+            })
+            Vue.component('refs-component',{
+              template:`<input ref="input" type="text" />`
+            })
+            new Vue({
+              el:'#L3',
+              methods:{
+                focus:function(){
+                this.$refs.uernameInput.focus()
+                }
+              }
+
+            })
+           </script>
+           <div id="L4">
+                <ref-component>
+                </ref-component>
+                
+           </div>
+           <script>
+            Vue.component('ref-component',{
+              template:`
+                        <div>
+                           <refs-component ref="name"></refs-component>
+                            <button  @click="focus">fouce</button>
+                        </div>
+                       `,
+              methods:{
+                focus:function(){
+                this.$refs.name.focus()
+                }
+              }
+            })
+            Vue.component('refs-component',{
+              template:`<input ref="name" type="text" />`,
+              methods:{
+                focus:function(){
+                this.$refs.name.focus()
+                }
+              }
+            })
+            new Vue({
+              el:'#L4'
+            })
+           </script>
+
+
+
+
+
+
+
+
+
+           
+</body>     
+</html>

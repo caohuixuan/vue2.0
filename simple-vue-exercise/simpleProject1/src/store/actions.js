@@ -1,0 +1,23 @@
+export default{
+	addNum({commit,state},id){
+        commit('rember_answer',id);
+        if(state.itemNum<state.itemDetail.length){
+        	commit('add_itemnum',1);
+        }
+	},
+	addText({commit},text){
+		commit('rember_text',text);
+	},
+	addPhone({commit},phone){
+		commit('rember_phone',phone);
+	},
+	addQq({commit},qq){
+		commit('rember_qq',qq);
+	},
+	answerContainer({state}){
+		console.log(state.answerid);
+		console.log(state.answerText);
+		console.log(state.phone);
+		console.log(state.qq);
+	}
+}

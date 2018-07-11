@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue-router的简单模板</title>
+</head>
+<body>
+<div id="app">
+<h1>简单的vue-router例子</h1>
+<p>
+       <router-link to='/home'>首页</router-link>
+       <router-link to='/pageone'>page1</router-link>
+       <router-link to='/tohome'>tohome</router-link>
+</p>
+<router-view></router-view> 
+</div>
+    <div id="one">
+     <h1>动态路由匹配+嵌套路由</h1>
+     <p>
+        <router-link to='/user/one'>one</router-link>
+        <!-- 通过路由命名来设置路径 这样设置默认的子路由将不会呈现-->
+        <router-link :to="{name:'user',params:{userId:'two'}}">two</router-link>
+        <router-link to='/user/two/one'>two-one</router-link>
+         <router-link to='/user/two/two'>two-two</router-link>
+     </p>
+     <router-view></router-view>
+    </div>
+    <div id="two"></div>
+    <div id="three"></div>
+    <div id="four"></div>
+    <div id="five"></div>
+    <div id="six"></div>
+    <div id="seven"></div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	     <div id="B2">
+        <ol>
+           <!--
+             现在我们为每个 todo-item 提供 todo 对象todo 对象是变量，即其内容可以是动态的。我们也需要为每个组件提供一个“key”，稍后再作详细解释。
+              -->
+         <Bb v-for="list in lists" v-bind:todo="list" v-bind:key="list.id"></Bb>
+         </ol>
+         </div>
+         <script>
+             Vue.component('Bb', {
+               props: ['todo'],
+               template: '<li>{{ todo.text }}</li>'
+            })
+            var B2 = new Vue({
+                el: '#B2',
+                data: {
+                      lists: [
+                           { id: 0, text: '蔬菜' },
+                           { id: 1, text: '奶酪' },
+                           { id: 2, text: '随便其它什么人吃的东西' }
+                         ]
+                       }
+                  })
+           
+          </script>
+</body>
+</html>

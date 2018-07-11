@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+     #requestAnim{
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background-color: #ccc;
+     }
+     #aaa{
+        position: absolute;
+        top: 100px;
+     }
+    </style>
+
+</head>
+<body>
+    <div id="requestAnim">
+      点击运行
+    </div>
+    <button id="aaa" onclick="restop();">点击停止</button>
+        <script>
+   var requestanimationThis;
+(function() {
+ var lastTime = 0;
+ var vendors = ['ms', 'moz', 'webkit', 'o'];
+ for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+  window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+  window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+ }
+ 
+ if (!window.requestAnimationFrame)
+  window.requestAnimationFrame = function(callback, element) {
+   var currTime = new Date().getTime();
+   var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+   var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+    timeToCall);
+   lastTime = currTime + timeToCall;
+   return id;
+  };
+ 
+ if (!window.cancelAnimationFrame)
+  window.cancelAnimationFrame = function(id) {
+   clearTimeout(id);
+  };
+}()); 
+   window.requestAnimFrame = (function(){//兼容浏览器
+      return  window.requestAnimationFrame       ||
+              window.webkitRequestAnimationFrame ||
+              window.mozRequestAnimationFrame    ||
+              window.oRequestAnimationFrame      ||
+              window.msRequestAnimationFrame     ||
+              function( callback ){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+    window.cancelRequestAnimFrame = ( function() {
+ return window.cancelAnimationFrame ||
+  window.webkitCancelRequestAnimationFrame ||
+  window.mozCancelRequestAnimationFrame ||
+  window.oCancelRequestAnimationFrame ||
+  window.msCancelRequestAnimationFrame ||
+  clearTimeout;
+} )();
+var elem = document.getElementById("requestAnim");
+var startTime = undefined;//全局的
+function render(time){//time是局部的
+  if (time === undefined)
+    time = Date.now();//获取到当前时间的毫秒数
+  if (startTime === undefined)
+     //第一次调用的时候startTime是undefined，之后就不是了
+     //而time每次调用都等于当前时间的毫秒数
+    startTime = time;
+    //当是500的整数倍的时候，left值从0开始
+  elem.style.left = ((time - startTime)/10%500) + "px";
+}
+elem.onclick = function(){
+    (function animloop(){
+      render();
+      //这里利用requestAnimFrame方法来控制渲染的帧数
+      requestanimationThis=requestAnimFrame(animloop);
+    })();
+}
+function restop(){
+    window.cancelAnimationFrame(requestanimationThis);
+}
+    </script>
+</body>
+</html>
