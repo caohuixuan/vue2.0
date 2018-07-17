@@ -19,6 +19,7 @@
         mounted(){
         	this.timer = setInterval(() => {
         		this.positionY ++;
+                console.log((this.positionY%7)*2.5);
         	}, 600)
         },
         beforeDestroy(){

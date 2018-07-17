@@ -6,10 +6,10 @@ module.exports = {
         env: {
             NODE_ENV: '"production"'
         },
-        index: path.resolve(__dirname, '../elm/index.html'),
-        assetsRoot: path.resolve(__dirname, '../elm'),
+        index: path.resolve(__dirname, '../mt/index.html'),
+        assetsRoot: path.resolve(__dirname, '../mt'),
         assetsSubDirectory: 'static',
-        assetsPublicPath: '/elm/',
+        assetsPublicPath: '/mt/',
         productionSourceMap: true,
         // Surge or Netlify already gzip all static assets for you.
         // Before setting to `true`, make sure to:
@@ -21,7 +21,7 @@ module.exports = {
         env: {
             NODE_ENV: '"development"'
         },
-        port: 8000,
+        port: 8333,
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         context: [ //代理路径

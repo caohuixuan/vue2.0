@@ -1,70 +1,33 @@
-$blue: #3190e8;  
-$bc: #e4e4e4;
-$fc:#fff;
-
-// 背景图片地址和大小
-@mixin bis($url) { 
-	background-image: url($url);
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
+$green:#0EC2AB;//主题绿色
+$grew1:#7A8185;//深灰
+$grew2:#B2B2B2;//浅灰
+$grew3:#FAFAFA;//背景灰
+$grew4:#EEEEEE;//线条灰
+$grew5:#CCCCCC;//详细内容头部灰
+$white:#FFFFFF;//白色
+$orange:#FF7F00;//橘色
+$red:#FF6347;//红色
+$redb:#FF7256;//红色边框
+$redp:#FFF8DC;//肉色粉底
+$black:#303030;//黑色
+//宽高设置
+@mixin wh($width,$height){
+	width:$width;
+	height:$height;
 }
-
-@mixin borderRadius($radius) {
-    -webkit-border-radius: $radius;
-    -moz-border-radius: $radius;
-    -ms-border-radius: $radius;
-    -o-border-radius: $radius;
-    border-radius: $radius;
-}
-//定位全屏
-@mixin allcover{
+@mixin juzhong(){
 	position:absolute;
-	top:0;
-	right:0;
+	left:50%;
+	top:50%;
+	transform: translate(-50%, -50%);
 }
-
-//定位上下左右居中
-@mixin center {  
-	position: absolute;
-	top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+@mixin fontstyle1($size,$color){
+	font-size:$size;
+	color:$color;
 }
-
-//定位上下居中
-@mixin ct {  
-	position: absolute;
-	top: 50%;
-    transform: translateY(-50%);
-}
-
-//定位上下居中
-@mixin cl {  
-	position: absolute;
-	left: 50%;
-    transform: translateX(-50%);
-}
-
-//宽高
-@mixin wh($width, $height){
-	width: $width;
-	height: $height;
-}
-
-//字体大小、行高、字体
-@mixin font($size, $line-height, $family: 'Microsoft YaHei') {  
-	font: #{$size}/#{$line-height} $family;
-}
-
-//字体大小，颜色
-@mixin sc($size, $color){
-	font-size: $size;
-	color: $color;
-}
-
-//flex 布局和 子元素 对其方式
-@mixin fj($type: space-between){
-	display: flex;
-	justify-content: $type;
-
+@mixin fontstyle2($size,$color,$weight,$family:'PingFangSC-Regular'){
+	font-family: $family;
+    font-size: $size;
+    color: $color;
+    font-weight:$weight;
 }

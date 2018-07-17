@@ -34,7 +34,7 @@ export const groupcity = () => fetch('/v1/cities', {
 
 export const currentcity = number => fetch('/v1/cities/' + number);
 
-
+//export const searchAddress=()=>fetch('https://apis.map.qq.com/ws/place/v1/suggestion/?region=北京&keyword=美食&key=WQCBZ-4FF3F-WI4JL-NJGAX-MECTJ-GMFWA');
 /**
  * 获取搜索地址
  */
