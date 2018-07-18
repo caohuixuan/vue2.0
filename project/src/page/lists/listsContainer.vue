@@ -1,6 +1,6 @@
 <template>
-    <div>
-         <div class="container_top">
+    <div class="listscontianer">
+        <div class="container_top">
               <router-link tag='section' class="goback" :to="{path:'/mHome',query:{point:myPoint}}">
               <svg class="goback_icon" width="1.6rem" height="1.6rem" xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <polyline points="12,18 4,9 12,0" style="fill:none;stroke:rgb(255,255,255);stroke-width:2"/>
@@ -21,7 +21,7 @@
                  </div>
               </div>
         </div>
-        <div class="contianer_active" v-if='actives'>
+        <div id="contianer_active" class="contianer_active" v-if='actives'>
               <span class="red_circle">减</span>
               <span v-for="act in resdetail.activities">{{act.description}}</span>
               <p>
@@ -43,9 +43,9 @@
               </div>
         </div>
         <transition name="type-choose">
-              <div class="food_T">
+              <div id="food_T" class="food_T">
               <section v-show="showType=='food'" class="food_page">
-                  <div class="food_menu_l">
+                  <div class="food_menu_l" id="menu_l" ref="menu_l">
                        <ul>
                            <li v-for="(item,index) in menuList" class="food_menu_li" :class="{actionMenu:index==menuIndex}" @click="chooseMenu(index)">
                                <img :src="getImgPath(item.icon_url)">
@@ -54,7 +54,7 @@
                            </li>
                        </ul>
                   </div>
-                  <div class="food_menu_r">
+                  <div class="food_menu_r" ref="menu_r">
                        <ul>
                            <li v-for="(item,index) in menuList">
                                <header class="r_title">
@@ -99,6 +99,7 @@ import loading from '../../components/common/loading1.vue';
 import {msiteAddress,shopList, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags} from '../../service/getData.js'
 import {imgBaseUrl} from '../../config/env.js';
 import {getImgPath} from '../../components/common/loadermore.js'
+import BScroll from 'better-scroll';
 export default{
 	name:'listContainer',
 	data(){
@@ -113,13 +114,22 @@ export default{
 	        showType:'food',//展示内容类型
 	        menuList:[],//食品列表
 	        menuIndex:0,//选中列表
+	        menuIndexChoose:true,//
 	        menuCount:[],//加入购物车单个产品数量
+	        menuTop:[],//食品列表top值
+	        bsscroll:null,//滑动控件
 	    }
 	},
 	watch:{
 	    showLoading:function(value){
-	        console.log(value);
+	       // console.log(value);
+	         if(!value){
+	             this.$nextTick(()=>{
+	               this.getFoodListHeight();
+	             })
+	         }
 	    },
+	    
 	},
 	components:{loading},
 	computed:{
@@ -133,31 +143,84 @@ export default{
 	},
 	methods:{
 	    async init(){
+	    const lineheight=document.documentElement.clientHeight;
+        document.getElementById('food_T').style.height=(lineheight*0.0625-14.9)+'rem';
 	    this.myPoint=this.$route.query.point;
 	    this.shopid=this.$route.query.id;  
 	    let thisres=await shopDetails(this.shopid,this.myPoint.latLng.lat,this.myPoint.latLng.lng);
 	    this.resdetail=thisres;
 	    if(this.resdetail.activities.length){
               this.actives=true;
+	    }else{
+	          this.actives=true;
 	    }
         this.menuList=await foodMenu(this.shopid);
-        console.log(this.menuList);
+        //console.log(this.menuList);
 	    this.getres=true;
 	    this.showLoading=false; 
 	    },
 	    chooseMenu(index){
 	        this.menuIndex=index;
-	        console.log(index);
-	    }
+	        //console.log(index);
+	        
+	        this.menuIndexChoose=false;
+	        this.bsscroll.scrollTo(0, -this.menuTop[index], 400);
+            this.bsscroll.on('scrollEnd', () => {
+                    this.menuIndexChoose = true;
+                })
+                
+	    },
+	    getFoodListHeight(){
+	        const foodMenu=this.$refs.menu_r;
+	        const foodArr=Array.from(foodMenu.children[0].children);
+	        foodArr.forEach((item,index)=>{
+                  this.menuTop[index]=item.offsetTop;
+                  //console.log(item.offsetTop);
+	        });
+            this.listenToScroll(foodMenu);
+	    },
+	    listenToScroll(el){
+            this.bsscroll=new BScroll(el,{
+                  probeType: 3,
+                  deceleration: 0.001,
+                  bounce: false,
+                  swipeTime: 2000,
+            });
+            const menuLeft=new BScroll('#menu_l',{
+                  click: true,
+            });
+            const menuLeftH=this.$refs.menu_l.clientHeight;
+            
+            this.bsscroll.on('scroll',(pos)=>{
+                  if(!this.$refs.menu_l){
+                       return;
+                  }
+                  //console.log(pos);
+                  this.menuTop.forEach((item,index)=>{
+                        if(this.menuIndexChoose && Math.abs(pos.y) >= item){
+                             this.menuIndex=index;
+                             const menuList=this.$refs.menu_l.querySelectorAll('.actionMenu');
+                             const e= menuList[0];
+                             //console.log(e);
+                             menuLeft.scrollToElement(e, 800, 0, 0); 
+                        }
+                  })
+            })
+	    },
 	}
 
 }
 </script>
 <style lang="scss" scoped>
 @import '../../style/mixin.scss';
+.listscontianer{
+	
+}
 .container_top{
+    position:absolute;
 	@include wh(100%,8rem);
 	background-color:$grew5;
+	z-index:10;
 	box-shadow:0rem -1.5rem 1.5rem #999 inset; 
 	.goback{
 	    position:relative;
@@ -215,6 +278,8 @@ export default{
     opacity:0;
 }
 .contianer_active{
+    position:absolute;
+    top:8rem;
 	@include wh(100%,1.8rem);
 	background-color:$white;
 	padding-top:1.2rem;
@@ -243,24 +308,18 @@ export default{
 	}
 }
 .change_nav{
+    position:absolute;
+    top:11rem;
 	@include wh(100%,3.8rem);
 	background-color:$white;
-	display:inline-block;
-    display:-moz-box;
-    -moz-box-orient:horizontal;
-    display:-webkit-box;
-    -webkit-box-orient:horizontal;
-    display:box;
-    box-orient:horizontal;
-    border-bottom:0.02rem solid $grew4;
+	display:flex;
     div{
       text-align:center;
       line-height:3.6rem;
       margin:0 2rem;
       height:3.6rem;
       @include fontstyle2(1.2rem,$grew1,500);
-      -webkit-box-flex: 1.0;
-      -moz-box-flex:1.0; 
+      flex:1;
     }
     .actionType{
          @include fontstyle2(1.2rem,$black,500);
@@ -268,22 +327,21 @@ export default{
     }
 }
 .food_T{
+position:absolute;
+top:14.9rem;
 @include wh(100%,100%);
- overflow-y: hidden;
 .food_page{
-    position:relative;
-    overflow-y: hidden;
-    background-color:#f00;
-    display: flex;
-    flex: 1;
+   position:absolute;
+   @include wh(100%,100%); 
+   overflow:hidden;
+    display:flex;
 	.food_menu_l{
-	    background-color:#ff0;
+        flex:1;
+        overflow-x:hidden;
+        overflow-y:auto;
 	    ul{
 	       width:100%;
 	       @include fontstyle2(1rem,$grew1,500);
-	       overflow: hidden;
-           text-overflow:ellipsis;
-           white-space: nowrap;
            .food_menu_li{
                line-height:5rem;
                list-style-type:none;
@@ -300,12 +358,11 @@ export default{
 	    }
 	}
 	.food_menu_r{
-        float:right;
-        flex:5;
+        flex:3;
+        overflow-x:hidden;
         overflow-y:auto;
         background-color:$white;
         ul{
-
             li{
                list-style-type:none;
                .r_title{
@@ -317,23 +374,23 @@ export default{
                        @include fontstyle2(1rem,$black,500);
                    }
                    span:nth-of-type(2){
-                       @include fontstyle2(0.8rem,$grew2,500);
+                       @include fontstyle2(0.8rem,$grew1,500);
                    }
                }
                .r_detail{
                    border-bottom:0.02rem solid $grew4;
                    @include wh(100%,8rem);
+                   display:flex;
                    .food_img{
-                       float:left;
+                       flex:3;
                        text-align:center;
-                       @include wh(6rem,8rem);
                        img{
-                          @include wh(5rem,5rem);
+                          @include wh(80%,5rem);
                           margin-top:0.8rem;
                        }
                    }
                    .food_detail{
-                       float:left;
+                       flex:7;
                        padding-left:0.8rem;
                        padding-top:0.5rem;
                        .food_detail_title{
