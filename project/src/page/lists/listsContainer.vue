@@ -1,6 +1,7 @@
 <template>
     <div class="listscontianer">
         <div class="container_top">
+              <div id="bg" class="bg bg-blur"></div>
               <router-link tag='section' class="goback" :to="{path:'/mHome',query:{point:myPoint}}">
               <svg class="goback_icon" width="1.6rem" height="1.6rem" xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <polyline points="12,18 4,9 12,0" style="fill:none;stroke:rgb(255,255,255);stroke-width:2"/>
@@ -80,6 +81,7 @@
                                           <span>{{food.specfoods[0].price}}</span>
                                           <span v-if="food.specifications.length">起</span>
                                       </p>
+                                      <order-c class="order_type" :shopid='shopid' :food='food'></order-c>
                                    </div>
                                    
                                </div> 
@@ -96,6 +98,7 @@
 </template>
 <script>
 import loading from '../../components/common/loading1.vue';
+import orderC from '../order/orderC.vue';
 import {msiteAddress,shopList, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags} from '../../service/getData.js'
 import {imgBaseUrl} from '../../config/env.js';
 import {getImgPath} from '../../components/common/loadermore.js'
@@ -131,7 +134,7 @@ export default{
 	    },
 	    
 	},
-	components:{loading},
+	components:{loading,orderC},
 	computed:{
         resmessage:function(){
              return this.resdetail.name;
@@ -144,11 +147,12 @@ export default{
 	methods:{
 	    async init(){
 	    const lineheight=document.documentElement.clientHeight;
-        document.getElementById('food_T').style.height=(lineheight*0.0625-14.9)+'rem';
+        document.getElementById('food_T').style.height=(lineheight*0.0625-18.9)+'rem';
 	    this.myPoint=this.$route.query.point;
 	    this.shopid=this.$route.query.id;  
 	    let thisres=await shopDetails(this.shopid,this.myPoint.latLng.lat,this.myPoint.latLng.lng);
 	    this.resdetail=thisres;
+        document.getElementById("bg").style.backgroundImage = "url('"+this.imgBaseUrl+this.resdetail.image_path+"')";
 	    if(this.resdetail.activities.length){
               this.actives=true;
 	    }else{
@@ -221,7 +225,26 @@ export default{
 	@include wh(100%,8rem);
 	background-color:$grew5;
 	z-index:10;
-	box-shadow:0rem -1.5rem 1.5rem #999 inset; 
+	box-shadow:0rem -1.5rem 1.5rem #999 inset;
+	.bg {
+	        position:absolute;
+            background:url('../../images/rabbit.svg');
+            height:8rem;
+            text-align: center;
+            line-height:8rem;
+        }
+    .bg-blur {
+            float: left;
+            width: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            -webkit-filter: blur(15px);
+            -moz-filter: blur(15px);
+            -o-filter: blur(15px);
+            -ms-filter: blur(15px);
+            filter: blur(15px);
+        } 
 	.goback{
 	    position:relative;
 	    top:1rem;
@@ -327,14 +350,15 @@ export default{
     }
 }
 .food_T{
-position:absolute;
+position:relative;
 top:14.9rem;
-@include wh(100%,100%);
+width:100%;
 .food_page{
-   position:absolute;
+   position:relative;
    @include wh(100%,100%); 
    overflow:hidden;
-    display:flex;
+   
+   display:flex;
 	.food_menu_l{
         flex:1;
         overflow-x:hidden;
@@ -391,6 +415,7 @@ top:14.9rem;
                    }
                    .food_detail{
                        flex:7;
+                       position:relative;
                        padding-left:0.8rem;
                        padding-top:0.5rem;
                        .food_detail_title{
@@ -420,6 +445,14 @@ top:14.9rem;
                           height:2.4rem;
                           line-height:2.4rem;
                           @include fontstyle2(1.1rem,$orange,600);
+                       }
+                       .order_type{
+                          position:absolute;
+                          bottom:0;
+                          right:0;
+                          text-align:center;
+                          line-height:2.4rem;
+                          @include wh(40%,2.4rem);
                        }
                    }
                }
