@@ -81,7 +81,7 @@
                                           <span>{{food.specfoods[0].price}}</span>
                                           <span v-if="food.specifications.length">起</span>
                                       </p>
-                                      <order-c class="order_type" :shopid='shopid' :food='food'></order-c>
+                                      <order-c class="order_type" :shopid='shopid' :food='food' @showChooseType="showChooseType"></order-c>
                                    </div>
                                    
                                </div> 
@@ -147,18 +147,18 @@ export default{
 	methods:{
 	    async init(){
 	    const lineheight=document.documentElement.clientHeight;
-        document.getElementById('food_T').style.height=(lineheight*0.0625-18.9)+'rem';
+      document.getElementById('food_T').style.height=(lineheight*0.0625-18.9)+'rem';
 	    this.myPoint=this.$route.query.point;
 	    this.shopid=this.$route.query.id;  
 	    let thisres=await shopDetails(this.shopid,this.myPoint.latLng.lat,this.myPoint.latLng.lng);
 	    this.resdetail=thisres;
-        document.getElementById("bg").style.backgroundImage = "url('"+this.imgBaseUrl+this.resdetail.image_path+"')";
+      document.getElementById("bg").style.backgroundImage = "url('"+this.imgBaseUrl+this.resdetail.image_path+"')";
 	    if(this.resdetail.activities.length){
               this.actives=true;
 	    }else{
 	          this.actives=true;
 	    }
-        this.menuList=await foodMenu(this.shopid);
+      this.menuList=await foodMenu(this.shopid);
         //console.log(this.menuList);
 	    this.getres=true;
 	    this.showLoading=false; 
@@ -211,6 +211,9 @@ export default{
                   })
             })
 	    },
+      showChooseType(food){
+           console.log("选择规格");
+      }
 	}
 
 }
@@ -452,7 +455,7 @@ width:100%;
                           right:0;
                           text-align:center;
                           line-height:2.4rem;
-                          @include wh(40%,2.4rem);
+                          @include wh(50%,2.4rem);
                        }
                    }
                }
