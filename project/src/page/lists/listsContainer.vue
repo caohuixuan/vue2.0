@@ -91,6 +91,30 @@
               </section>
               </div>
         </transition>
+        <section>
+              <transition name="fade">
+                   <div class="type_cover" @click="showChooseType" v-if="chooseFoodType"></div>
+              </transition>
+              <transition name="fade">
+                   <div class="type_choose" v-if="chooseFoodType">
+                      <header class="type_header">
+                        <h3>{{chooseNowFood.name}}</h3>
+                        <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" version="1.1"class="specs_cancel" @click="showChooseType">
+                            <line x1="0" y1="0" x2="16" y2="16"  stroke="#666" stroke-width="1.2"/>
+                            <line x1="0" y1="16" x2="16" y2="0"  stroke="#666" stroke-width="1.2"/>
+                        </svg>
+                      </header>
+                      <section class="type_detail">
+                        <h4>{{chooseNowFood.specifications[0].name}}</h4>
+                        <ul>
+                            <li v-for="(item) in chooseNowFood.specifications[0].values">{{item}}</li>
+                        </ul>
+                      </section>
+                      <footer class="type_footer">
+                      </footer>
+                   </div>
+              </transition>
+        </section>
         <transition name="loading"> 
               <loading v-if="showLoading"></loading>
         </transition>
@@ -121,7 +145,10 @@ export default{
 	        menuCount:[],//加入购物车单个产品数量
 	        menuTop:[],//食品列表top值
 	        bsscroll:null,//滑动控件
-	    }
+          chooseNowFood:null,//选择的当前食品
+          chooseFoodType:false,//显示食品规格选项内容
+	        chooseTypeNum:0,//当前选中的食品规格
+      }
 	},
 	watch:{
 	    showLoading:function(value){
@@ -212,7 +239,13 @@ export default{
             })
 	    },
       showChooseType(food){
-           console.log("选择规格");
+          // console.log("选择规格");
+          if(food){
+             this.chooseNowFood=food;
+             console.log(this.chooseNowFood);
+          }
+          this.chooseFoodType=!this.chooseFoodType;
+          this.chooseTypeNum=0;
       }
 	}
 
@@ -463,5 +496,19 @@ width:100%;
         }
 	}
 }
+}
+.type_cover{
+    position:absolute;
+    top:0;
+    @include wh(100%,100%);
+    background-color:rgba(0,0,0,0.2);
+}
+.type_choose{
+    position:absolute;
+    top:35%;
+    left:15%;
+    @include wh(70%,30%);
+    background-color:$white;
+    border-radius:1rem;
 }
 </style>
