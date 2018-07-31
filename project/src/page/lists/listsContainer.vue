@@ -81,7 +81,7 @@
                                           <span>{{food.specfoods[0].price}}</span>
                                           <span v-if="food.specifications.length">起</span>
                                       </p>
-                                      <order-c class="order_type" :shopid='shopid' :food='food' @showChooseType="showChooseType"></order-c>
+                                      <order-c class="order_type" :shopid='shopid' :food='food' @showChooseType="showChooseType" @minusChooseType="minusChooseType"></order-c>
                                    </div>
                                    
                                </div> 
@@ -99,21 +99,45 @@
                    <div class="type_choose" v-if="chooseFoodType">
                       <header class="type_header">
                         <h3>{{chooseNowFood.name}}</h3>
+                        <div class="close">
                         <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" version="1.1"class="specs_cancel" @click="showChooseType">
                             <line x1="0" y1="0" x2="16" y2="16"  stroke="#666" stroke-width="1.2"/>
                             <line x1="0" y1="16" x2="16" y2="0"  stroke="#666" stroke-width="1.2"/>
                         </svg>
+                        </div>
                       </header>
-                      <section class="type_detail">
+                      <section  class="type_detail">
                         <h4>{{chooseNowFood.specifications[0].name}}</h4>
                         <ul>
-                            <li v-for="(item) in chooseNowFood.specifications[0].values">{{item}}</li>
+                            <li v-for="(item,index) in chooseNowFood.specifications[0].values" :class="{hasChoosed:index==chooseTypeNum}" @click="chooseThisType(index)">{{item}}</li>
                         </ul>
                       </section>
                       <footer class="type_footer">
+                        <div class="choose_food_price">
+                            <span>￥</span>
+                            <span>{{chooseNowFood.specfoods[chooseTypeNum].price}}</span>
+                        </div>
+                        <div class="choose_food_add" @click="addThisType(chooseNowFood.category_id, chooseNowFood.item_id, chooseNowFood.specfoods[chooseTypeNum].food_id, chooseNowFood.specfoods[chooseTypeNum].name, chooseNowFood.specfoods[chooseTypeNum].price, chooseNowFood.specifications[0].values[chooseTypeNum], chooseNowFood.specfoods[chooseTypeNum].packing_fee, chooseNowFood.specfoods[chooseTypeNum].sku_id, chooseNowFood.specfoods[chooseTypeNum].stock)">
+                        加入购物车
+                        </div>
                       </footer>
                    </div>
               </transition>
+        </section>
+        <section :class="foodNum==0?'cartContianer':'cartContianerAction'">
+             <div class="noNum" v-if="!foodNum">
+               <img src="../../images/postman.svg">
+               <span>另需配送费5元</span>
+               <div>￥15起送</div>
+             </div>
+             <div class="hasNum"  v-if="foodNum">
+               <img src="../../images/postman1.svg">
+               <span>另需配送费5元</span>
+               <div>￥15起送</div>
+             </div>
+        </section>
+        <section class="chooseTip" v-if="noChooseTip">
+              <span>请在购物车中删除商品</span>
         </section>
         <transition name="loading"> 
               <loading v-if="showLoading"></loading>
@@ -121,6 +145,7 @@
     </div>
 </template>
 <script>
+import {mapState,mapMutations} from 'vuex';
 import loading from '../../components/common/loading1.vue';
 import orderC from '../order/orderC.vue';
 import {msiteAddress,shopList, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags} from '../../service/getData.js'
@@ -148,6 +173,8 @@ export default{
           chooseNowFood:null,//选择的当前食品
           chooseFoodType:false,//显示食品规格选项内容
 	        chooseTypeNum:0,//当前选中的食品规格
+          noChooseTip:false,//是否显示noshoosetip
+          timer:null,//计时器
       }
 	},
 	watch:{
@@ -163,8 +190,16 @@ export default{
 	},
 	components:{loading,orderC},
 	computed:{
+        ...mapState(['myCard']),
         resmessage:function(){
              return this.resdetail.name;
+        },
+        shopCart:function(){
+          return Object.assign({},this.myCard[this.shopid]);
+        },
+        foodNum:function(){
+
+           return Object.values(this.shopCart).length;
         }
 	},
 	mixins:[getImgPath],
@@ -172,6 +207,9 @@ export default{
 	    this.init();
 	},
 	methods:{
+      ...mapMutations([
+          'ADDCART','MINUSCART'
+      ]),
 	    async init(){
 	    const lineheight=document.documentElement.clientHeight;
       document.getElementById('food_T').style.height=(lineheight*0.0625-18.9)+'rem';
@@ -242,10 +280,26 @@ export default{
           // console.log("选择规格");
           if(food){
              this.chooseNowFood=food;
-             console.log(this.chooseNowFood);
+            // console.log(this.chooseNowFood);
           }
           this.chooseFoodType=!this.chooseFoodType;
           this.chooseTypeNum=0;
+      },
+      chooseThisType(index){
+          this.chooseTypeNum=index;
+      },
+      addThisType(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
+          console.log("加入购物车");
+          this.ADDCART({shopid:this.shopid,category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
+          this.showChooseType();
+      },
+      minusChooseType(){
+          this.noChooseTip=true;
+          clearTimeout(this.timer);
+          this.timer=setTimeout(()=>{
+              this.noChooseTip=false;
+              clearTimeout(this.timer);
+          },3000)
       }
 	}
 
@@ -506,9 +560,120 @@ width:100%;
 .type_choose{
     position:absolute;
     top:35%;
-    left:15%;
-    @include wh(70%,30%);
+    left:10%;
+    width:80%;
+    min-height:12rem;
     background-color:$white;
-    border-radius:1rem;
+    border-radius:0.5rem;
+    .type_header{
+       position:relative;
+       @include wh(100%,2.2rem);
+       text-align:center;
+       border-radius:1rem;
+       h3{
+         @include fontstyle2(1.6rem,$black,500);
+       }
+       .close{
+         position:absolute;
+         right:0.8rem;
+         top:0.6rem;
+       }
+    }
+    .type_detail{
+       h4{
+          @include fontstyle2(1rem,$grew1,500);
+          padding:0.4rem 0 0.4rem 0.8rem;
+       }
+       ul{
+          padding:0.4rem 0 0.4rem 0.8rem;
+          display: flex;
+          flex-wrap: wrap;
+          li{
+            @include fontstyle2(1rem,$black,500);
+            margin-right:0.5rem;
+            border:0.025rem solid $grew2;
+            padding:0.2rem 1rem;
+            border-radius:0.2rem;
+            list-style-type:none;
+          }
+          .hasChoosed{
+            @include fontstyle2(1rem,$orange,500);
+            margin-right:0.5rem;
+            border:0.025rem solid $orange;
+            padding:0.2rem 1rem;
+            border-radius:0.2rem;
+            list-style-type:none;
+            background:rgba(255,127,0,0.05);
+          }
+       }
+    }
+    .type_footer{
+       position:absolute;
+       bottom:0;
+       border-top:0.03rem solid $grew4;
+       border-bottom-left-radius:0.5rem;
+       border-bottom-right-radius:0.5rem;
+       @include wh(100%,3rem);
+       background-color:$grew3;
+       .choose_food_price{
+          padding:0.3rem 0.8rem;
+          span{
+             @include fontstyle2(1.6rem,$red,700);
+          }
+       }
+       .choose_food_add{
+          position:absolute;
+          right:0.8rem;
+          top:0.6rem;
+          @include fontstyle2(1rem,$black,600);
+          background:$orange1;
+          padding:0.2rem 0.8rem;
+          border-radius:0.8rem;
+       }
+    }
+}
+.chooseTip{
+    position:absolute;
+    top:50%;
+    @include wh(100%,100%);
+    text-align:center;
+    span{
+       padding:0.5rem 1.5rem;
+       background:rgba(10,10,10,0.8);
+       @include fontstyle2(1rem,$white,400);
+    }
+}
+.cartContianer{
+    position:fixed;
+    bottom:0;
+    @include wh(100%,4rem);
+    background:$black;
+    .noNum{
+      img{
+       position:absolute;
+       top:-3.3rem;
+       left:0.8rem;
+       @include wh(6rem,10rem);
+      }
+      span{
+        @include fontstyle2(1rem,$grew2,400);
+        line-height:4rem;
+        margin-left:8rem;
+      }
+      div{
+        position:absolute;
+        top:0;
+        right:0;
+        line-height:4rem;
+        padding-right:0.8rem;
+        @include fontstyle2(1.2rem,$grew2,400);
+      }
+    }  
+}
+.cartContianerAction{
+    position:fixed;
+    bottom:0;
+    @include wh(100%,4rem);
+    background:#ff0;
 }
 </style>

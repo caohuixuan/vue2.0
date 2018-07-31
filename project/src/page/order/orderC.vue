@@ -20,7 +20,7 @@
           <section v-else class="chooseType">
                <div class=" ">
                     <transition name="showReduce">
-                     <span class="" v-if="foodNum">
+                     <span class="" v-if="foodNum" @click="minusChooseType">
                         <svg style="fill:#7A8185;width:1.2rem;height:1.2rem;">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                         </svg>
@@ -53,7 +53,11 @@ export default{
           let item_id = this.food.item_id;
           let food_id= this.food.specfoods[0].food_id;
           if(this.shopCart&&this.shopCart[category_id]&&this.shopCart[category_id][item_id]){
-              return this.shopCart[category_id][item_id][food_id].num;
+              let num=0;
+              Object.values(this.shopCart[category_id][item_id]).forEach((item,index)=>{
+                 num=num+item.num;
+              })
+              return num;
           }else{
               return 0;
           }
@@ -80,6 +84,9 @@ export default{
       },
       showChooseType(food){
           this.$emit('showChooseType',food);
+      },
+      minusChooseType(){
+          this.$emit('minusChooseType');
       }
   }
 }
