@@ -40,7 +40,7 @@ export default{
 	name:'orderC',
 	props:['food','shopid'],
 	mounted(){
-	    console.log(this.food);
+	    //console.log(this.food);
 	},
 	computed:{
 	    ...mapState(['myCard']),
@@ -52,7 +52,7 @@ export default{
           let category_id = this.food.category_id;
           let item_id = this.food.item_id;
           let food_id= this.food.specfoods[0].food_id;
-          if(this.shopCart&&this.shopCart[category_id]&&this.shopCart[category_id][item_id]){
+          if(this.shopCart&&this.shopCart[category_id]&&this.shopCart[category_id][item_id]&&this.shopCart[category_id][item_id][food_id]){
               let num=0;
               Object.values(this.shopCart[category_id][item_id]).forEach((item,index)=>{
                  num=num+item.num;

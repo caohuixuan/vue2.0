@@ -6,6 +6,7 @@ const city=r=>require.ensure([],()=>r(require('../page/city/city.vue')),'city')
 const mHome=r=>require.ensure([],()=>r(require('../page/mHome/mHome.vue')),'mHome')
 const searchT=r=>require.ensure([],()=>r(require('../page/searchT/searchT.vue')),'searchT')
 const lists=r=>require.ensure([],()=>r(require('../page/lists/listsContainer.vue')),'lists')
+const myCart=r=>require.ensure([],()=>r(require('../page/myCart/myCart.vue')),'myCart')
 
 export default [{
 	path:'/',
@@ -42,6 +43,10 @@ export default [{
 	  {
 	  	path:'/lists',
 	  	component:lists
+	  },
+	  {
+	  	path:'/myCart',
+	  	component:myCart
 	  }
 	]
 }]

@@ -13,6 +13,7 @@ export default{
         //console.log(state.myPoint);
 	},
 	ADDCART(state,{shopid,category_id,item_id,food_id,name,price,specs,packing_fee,sku_id,stock}){
+        //console.log(category_id+","+item_id+","+food_id+","+name+","+price+","+specs+",");
         let cart=state.myCard;
         let shop=cart[shopid]=(cart[shopid]||{});
         let category=shop[category_id]=(shop[category_id]||{});
@@ -41,15 +42,20 @@ export default{
         let category=(shop[category_id]||{});
         let item=(category[item_id]||{});
         if(item&&item[food_id]){
-        	if(item[food_id]['num']>1){
+        	if(item[food_id]['num']>0){
+
         		item[food_id]['num']--;
         		state.myCard={...cart};
+                        //console.log(item[food_id]);
         		setStore('myCard',state.myCard);
+                    
+                        
         	}else{
-        		cart[shopid]=null;
-        		state.myCard={...cart};
+                        //console.log(item[food_id]);
+        		item[food_id]=null;
+        		//state.myCard={...cart};
         		 //console.log(state.myCard);
-        		setStore('myCard',state.myCard);
+        		//setStore('myCard',state.myCard);
         	}
         }
         

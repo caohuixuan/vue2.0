@@ -124,20 +124,57 @@
                    </div>
               </transition>
         </section>
-        <section :class="foodNum==0?'cartContianer':'cartContianerAction'">
-             <div class="noNum" v-if="!foodNum">
+        <section :class="allCount==0?'cartContianer':'cartContianerAction'">
+             <div class="noNum" v-if="!allCount">
                <img src="../../images/postman.svg">
                <span>另需配送费5元</span>
-               <div>￥15起送</div>
+               <div>￥30起送</div>
              </div>
-             <div class="hasNum"  v-if="foodNum">
+             <div class="hasNum" @click="showCartList" v-if="allCount" >
                <img src="../../images/postman1.svg">
-               <span>另需配送费5元</span>
-               <div>￥15起送</div>
+               <span>￥{{allCount}}</span>
+               <div>￥30起送</div>
+               <div class="chapay" v-if='chaPay>0' >还差{{chaPay}}</div>
+               <router-link :to="{path:'/myCart'}" tag="div" class="goPay">去结算</router-link>
              </div>
+
+        </section>
+        <section>
+             <transition name="toggle-cart">
+                <section class="cart_food_list" v-if="showCartListTip">
+                    <header>
+                      <h4>购物车</h4>
+                        <div @click="clearAll">
+                            <svg>
+                              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-remove"></use>
+                            </svg>
+                            <span class="clear_cart">清空</span>
+                        </div>
+                    </header>
+                    <div class='cart_list_detail'>
+                        <ul>
+                           <li class="li_detail" v-for="(item,index) in cartList">
+                              <span class="li_name">{{item.name}}</span>
+                              <span class="li_pay">￥{{item.price}}</span>
+                              <span class="li_change">
+                                 <svg style="fill:#7A8185;width:1.2rem;height:1.2rem;" @click="minusCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)" width=".8rem" height=".8rem">
+                                       <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
+                                 </svg>
+                                 <span class="cart_num">{{item.num}}</span>
+                                 <svg class="cart_add" @click="addCart(item.category_id, item.item_id, item.food_id)" style="fill:#FFCC54;width:1.2rem;height:1.2rem;">
+                                       <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
+                                 </svg>  
+                              </span>
+                           </li>
+                        </ul>
+                    </div>
+                </section>
+             </transition>
         </section>
         <section class="chooseTip" v-if="noChooseTip">
               <span>请在购物车中删除商品</span>
+        </section>
+        <section @click="showCartList" class="backPage" v-if="showCartListTip">
         </section>
         <transition name="loading"> 
               <loading v-if="showLoading"></loading>
@@ -175,6 +212,8 @@ export default{
 	        chooseTypeNum:0,//当前选中的食品规格
           noChooseTip:false,//是否显示noshoosetip
           timer:null,//计时器
+          showCartListTip:false,//是否展示购物车列表
+          cartList:[],//购物车列表信息
       }
 	},
 	watch:{
@@ -198,8 +237,27 @@ export default{
           return Object.assign({},this.myCard[this.shopid]);
         },
         foodNum:function(){
-
            return Object.values(this.shopCart).length;
+        },
+        allCount:function(){
+           let myCount=0;
+           this.getCartList();
+           Object.values(this.shopCart).forEach((item,index)=>{
+                     //   console.log(Object.values(item))
+                    Object.values(item).forEach((tt,index)=>{
+                        //console.log(Object.values(tt))
+                     Object.values(tt).forEach((t,index)=>{
+                        myCount+=Object.values(t)[3]*Object.values(t)[0]
+                         //console.log(Object.values(t)); 
+                    })
+                    })
+           })
+           //console.log("price="+myCount);
+           return myCount;
+        },
+        chaPay:function(){
+           let a=35;
+           return (a-this.allCount);
         }
 	},
 	mixins:[getImgPath],
@@ -289,7 +347,7 @@ export default{
           this.chooseTypeNum=index;
       },
       addThisType(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
-          console.log("加入购物车");
+        //  console.log("加入购物车");
           this.ADDCART({shopid:this.shopid,category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
           this.showChooseType();
       },
@@ -300,6 +358,57 @@ export default{
               this.noChooseTip=false;
               clearTimeout(this.timer);
           },3000)
+      },
+      showCartList(){
+          this.showCartListTip=!this.showCartListTip;
+        //  console.log("showCartList");
+      },
+      getCartList(){
+          let listIndex=0;
+          this.cartList=[];
+          //console.log(Object.values(this.shopCart));
+           this.menuList.forEach((item,index)=>{
+                //console.log(item);
+                if(this.shopCart&&this.shopCart[item.foods[0].category_id]){
+                   // console.log(Object.values(this.shopCart[item.foods[0].category_id]));
+                     Object.keys(this.shopCart[item.foods[0].category_id]).forEach(itemid => {
+                           // console.log(this.shopCart[item.foods[0].category_id][itemid])
+                           Object.keys(this.shopCart[item.foods[0].category_id][itemid]).forEach(foodid => {
+                              // console.log(this.shopCart[item.foods[0].category_id][itemid][foodid].num)
+                              if(this.shopCart[item.foods[0].category_id][itemid][foodid].num>0){
+                                  this.cartList[listIndex]={};
+                                  this.cartList[listIndex].category_id=item.foods[0].category_id;
+                                  this.cartList[listIndex].item_id=itemid;
+                                  this.cartList[listIndex].food_id=foodid;
+                                  this.cartList[listIndex].num=this.shopCart[item.foods[0].category_id][itemid][foodid].num;
+                                  this.cartList[listIndex].price=this.shopCart[item.foods[0].category_id][itemid][foodid].price;
+                                  this.cartList[listIndex].name=this.shopCart[item.foods[0].category_id][itemid][foodid].name;
+                                  this.cartList[listIndex].specs=this.shopCart[item.foods[0].category_id][itemid][foodid].specs;
+                                  listIndex++;
+                              }
+                           })
+                     })
+                }
+           })
+        //   console.log(this.cartList);
+      },
+      addCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
+          this.ADDCART({shopid:this.shopid,category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
+
+      },
+      minusCart(category_id, item_id, food_id){
+          if(this.foodNum){
+              this.MINUSCART({shopid:this.shopid,category_id, item_id, food_id})
+          }
+      },
+      clearAll(){
+          this.cartList.forEach((item)=>{
+                 let category_id=item.category_id;
+                 let item_id=item.item_id;
+                 let food_id=item.food_id;
+              this.MINUSCART({shopid:this.shopid,category_id, item_id, food_id})
+          })
+          this.showCartList();
       }
 	}
 
@@ -389,6 +498,12 @@ export default{
 }
 .loading-enter,.loading-leave-active{
     opacity:0;
+}
+.toggle-cart-enter-active, .toggle-cart-leave-active {
+        transition: all .3s ease-out;
+}
+.toggle-cart-enter, .toggle-cart-leave-active {
+        transform: translateY(100%);
 }
 .contianer_active{
     position:absolute;
@@ -648,6 +763,7 @@ width:100%;
     bottom:0;
     @include wh(100%,4rem);
     background:$black;
+    z-index:1000;
     .noNum{
       img{
        position:absolute;
@@ -674,6 +790,111 @@ width:100%;
     position:fixed;
     bottom:0;
     @include wh(100%,4rem);
-    background:#ff0;
+    background:$black;
+    z-index:1000;
+    .hasNum{
+      img{
+       position:absolute;
+       top:-3.3rem;
+       left:0.8rem;
+       @include wh(6rem,10rem);
+      }
+      span{
+        display:inline-block;
+        @include fontstyle2(1.6rem,$white,400);
+        margin-left:8rem;
+        padding-top:0.3rem;
+      }
+      div{
+        @include fontstyle2(1rem,$grew2,400);
+        margin-left:8.3rem;
+      }
+      .chapay{
+        position:absolute;
+        top:0;
+        right:0;
+        @include wh(8.5rem,4rem);
+        line-height:4rem;
+        text-align:center;
+        background:$black;
+        z-index:100;
+        @include fontstyle2(1.3rem,$grew2,500);
+      }
+      .goPay{
+        position:absolute;
+        top:0;
+        right:0;
+        @include wh(8rem,4rem);
+        line-height:4rem;
+        text-align:center;
+        background:$orange;
+        @include fontstyle2(1.3rem,$black,500);
+      }
+    }
+}
+.cart_food_list{
+    z-index:100;
+    position:fixed;
+    background:$grew3;
+    bottom:4rem;
+    width:100%;
+    header{
+         padding:0 .8rem;
+         @include wh(100%,2rem);
+         background:$grew4;
+         h4{
+            line-height:2rem;
+            float:left;
+            @include fontstyle2(1rem,$black,400);
+         }
+         div{
+            position:absolute;
+            right:0;
+            @include wh(6rem,2rem);
+            text-align:center;
+            line-height:2rem;
+            svg{      
+              color:$black;
+              @include wh(.9rem,.9rem);
+            }
+            span{
+              @include fontstyle2(.9rem,$black,400);
+            }
+         }
+    }
+    .cart_list_detail{
+        position:relative;
+        padding:0 .5rem;
+        max-height:10rem;
+        overflow-y:auto;
+        overflow-x:hidden;
+        width:100%;
+        .li_detail{
+            margin:0 .5rem;
+            @include wh(90%,3rem);
+            line-height:3rem;
+            border-bottom:0.03rem solid $grew4;
+            display:flex;
+            .li_name{
+              flex:2;
+              @include fontstyle2(1rem,$grew1,500);
+            } 
+            .li_pay{
+              flex:1;
+              @include fontstyle2(1.1rem,$black,400);
+            }
+            .li_changeP{
+              position:absolute;
+              top:0;
+            }
+        }
+    }
+}
+.backPage{
+  position:absolute;
+  top:0;
+   @include wh(100%,100%);
+   z-index:70;
+   background:rgba(10,10,10,0.3);
 }
 </style>
