@@ -1,6 +1,6 @@
 <template>
     <div class="listscontianer">
-        <div class="container_top">
+        <div class="container_top" @click="showActive">
               <div id="bg" class="bg bg-blur"></div>
               <router-link tag='section' class="goback" :to="{path:'/mHome',query:{point:myPoint}}">
               <svg class="goback_icon" width="1.6rem" height="1.6rem" xmlns="http://www.w3.org/2000/svg" version="1.1">
@@ -22,7 +22,7 @@
                  </div>
               </div>
         </div>
-        <div id="contianer_active" class="contianer_active" v-if='actives'>
+        <div id="contianer_active"  @click="showActive" class="contianer_active" v-if='actives'>
               <span class="red_circle">减</span>
               <span v-for="act in resdetail.activities">{{act.description}}</span>
               <p>
@@ -32,6 +32,8 @@
               </svg>
               </p>
         </div>
+        <transition name="">
+        <section class="container_page">
         <div class="change_nav">
               <div :class="{actionType:showType=='food'}" @click="showType='food'">
                   <span>点菜</span>
@@ -62,11 +64,11 @@
                                     <span>{{item.name}}</span>
                                     <span>{{item.description}}</span>
                                </header>
-                               <div v-for='(food,num) in item.foods' class="r_detail">
-                                   <div class="food_img">
+                               <div v-for='(food,num) in item.foods' class="r_detail">                   
+                                   <div class="food_img" @click="showDetail(food)">
                                       <img :src="imgBaseUrl+food.image_path">
                                    </div>
-                                   <div class="food_detail">
+                                   <div class="food_detail" @click="showDetail(food)">
                                       <h3 class="food_detail_title">{{food.name}}</h3>
                                       <p class="food_detail_description">{{food.description}}</p>
                                       <p class="food_detail_count">
@@ -76,6 +78,8 @@
                                       <p class="food_detail_activity">
                                          <span v-if="food.activity">{{food.activity.image_text}}</span>
                                       </p>
+                                   </div>
+                                   <div class="food_pay">
                                       <p class="food_detail_price">
                                           <span>￥</span>
                                           <span>{{food.specfoods[0].price}}</span>
@@ -83,19 +87,48 @@
                                       </p>
                                       <order-c class="order_type" :shopid='shopid' :food='food' @showChooseType="showChooseType" @minusChooseType="minusChooseType"></order-c>
                                    </div>
-                                   
                                </div> 
                            </li>
                        </ul>
                   </div>
-              </section>
-              </div>
+                  <section :class="allCount==0?'cartContianer':'cartContianerAction'">
+                       <div class="noNum" v-if="!allCount">
+                             <img src="../../images/postman.svg">
+                             <span>另需配送费5元</span>
+                             <div>￥30起送</div>
+                       </div>
+                       <div class="hasNum" @click="showCartList" v-if="allCount" >
+                             <img src="../../images/postman1.svg">
+                             <span>￥{{allCount}}</span>
+                             <div>￥30起送</div>
+                             <div class="chapay" v-if='chaPay>0' >还差{{chaPay}}</div>
+                             <router-link :to="{path:'/myCart'}" tag="div" class="goPay">去结算</router-link>
+                       </div>
+               </section>
+             </section>   
+             </div>
+        </transition>
+        </section>
+        </transition>
+        <transition name="">
+        <section id="activePage" class="active_page" v-if="showActTip">
+            <h1>商家活动</h1>
+            <p><span v-for="act in resdetail.activities">{{act.description}}</span></p>
+            <h1>相关支持</h1>
+            <p><span v-for="sup in resdetail.supports">{{sup.name}}</span></p>
+            <h1>配送</h1>
+            <p><span>配送时间</span><span>{{resdetail.opening_hours[0]}}</span></p>
+            <p><span>配送费</span><span>{{resdetail.float_delivery_fee}}</span></p>
+            <p><span>电话</span><span>{{resdetail.phone}}</span></p>
+            <h1>公告</h1>
+            <p><span>{{resdetail.promotion_info}}</span></p>
+        </section>
         </transition>
         <section>
-              <transition name="fade">
+              <transition name="">
                    <div class="type_cover" @click="showChooseType" v-if="chooseFoodType"></div>
               </transition>
-              <transition name="fade">
+              <transition name="">
                    <div class="type_choose" v-if="chooseFoodType">
                       <header class="type_header">
                         <h3>{{chooseNowFood.name}}</h3>
@@ -124,21 +157,7 @@
                    </div>
               </transition>
         </section>
-        <section :class="allCount==0?'cartContianer':'cartContianerAction'">
-             <div class="noNum" v-if="!allCount">
-               <img src="../../images/postman.svg">
-               <span>另需配送费5元</span>
-               <div>￥30起送</div>
-             </div>
-             <div class="hasNum" @click="showCartList" v-if="allCount" >
-               <img src="../../images/postman1.svg">
-               <span>￥{{allCount}}</span>
-               <div>￥30起送</div>
-               <div class="chapay" v-if='chaPay>0' >还差{{chaPay}}</div>
-               <router-link :to="{path:'/myCart'}" tag="div" class="goPay">去结算</router-link>
-             </div>
-
-        </section>
+        
         <section>
              <transition name="toggle-cart">
                 <section class="cart_food_list" v-if="showCartListTip">
@@ -214,6 +233,7 @@ export default{
           timer:null,//计时器
           showCartListTip:false,//是否展示购物车列表
           cartList:[],//购物车列表信息
+          showActTip:false,//是否显示活动页面
       }
 	},
 	watch:{
@@ -275,12 +295,9 @@ export default{
 	    this.shopid=this.$route.query.id;  
 	    let thisres=await shopDetails(this.shopid,this.myPoint.latLng.lat,this.myPoint.latLng.lng);
 	    this.resdetail=thisres;
-      document.getElementById("bg").style.backgroundImage = "url('"+this.imgBaseUrl+this.resdetail.image_path+"')";
-	    if(this.resdetail.activities.length){
-              this.actives=true;
-	    }else{
-	          this.actives=true;
-	    }
+      console.log(this.resdetail);
+      document.getElementById("bg").style.backgroundImage = "url('"+this.imgBaseUrl+this.resdetail.image_path+"')";  
+              this.actives=true;	    
       this.menuList=await foodMenu(this.shopid);
         //console.log(this.menuList);
 	    this.getres=true;
@@ -397,18 +414,35 @@ export default{
 
       },
       minusCart(category_id, item_id, food_id){
-          if(this.foodNum){
-              this.MINUSCART({shopid:this.shopid,category_id, item_id, food_id})
-          }
+             
+              this.MINUSCART({shopid:this.shopid,category_id, item_id, food_id});
+              if(this.allCount==0){
+                  this.showCartList();
+              }
       },
       clearAll(){
+         // console.log(this.cartList);
           this.cartList.forEach((item)=>{
                  let category_id=item.category_id;
                  let item_id=item.item_id;
                  let food_id=item.food_id;
-              this.MINUSCART({shopid:this.shopid,category_id, item_id, food_id})
+                 let num=item.num;
+                 for(let i=0;i<num;i++){
+                      this.MINUSCART({shopid:this.shopid,category_id, item_id, food_id})
+                 }
           })
           this.showCartList();
+      },
+      showActive(){
+         this.showActTip=!this.showActTip;
+         //document.getElementById('activePage').style.height=(lineheight*0.0625-18.9)+'rem';
+          //console.log(this.showActTip);
+      },
+      showDetail(food){
+         console.log(food);
+         let shopId=this.shopid;
+         let mypoint=this.myPoint;
+         this.$router.push({path:'/food',query:{food,shopId,mypoint}})
       }
 	}
 
@@ -505,6 +539,21 @@ export default{
 .toggle-cart-enter, .toggle-cart-leave-active {
         transform: translateY(100%);
 }
+.fade-enter-active, .fade-leave-active {
+        transition: all 1s ease-out;
+}
+.fade-cart-enter, .fade-leave-active {
+        transform: translateY(100%);
+}
+.type-choose-enter-active, .type-choose-leave-active {
+        transition: opacity .5s;
+    }
+.type-choose-leave, .type-choose-leave-active {
+        display: none;
+    }
+.type-choose-enter, .type-choose-leave-active {
+        opacity: 0;
+    }
 .contianer_active{
     position:absolute;
     top:8rem;
@@ -608,18 +657,17 @@ width:100%;
                }
                .r_detail{
                    border-bottom:0.02rem solid $grew4;
-                   @include wh(100%,8rem);
-                   display:flex;
+                   @include wh(100%,rem);
                    .food_img{
-                       flex:3;
                        text-align:center;
+                       float:left;
+                       @include wh(35%,7rem);
                        img{
-                          @include wh(80%,5rem);
-                          margin-top:0.8rem;
+                          @include wh(5rem,5rem);
+                          margin-top:0.5rem;
                        }
                    }
                    .food_detail{
-                       flex:7;
                        position:relative;
                        padding-left:0.8rem;
                        padding-top:0.5rem;
@@ -645,19 +693,22 @@ width:100%;
                              border:0.03rem solid $redb;
                              border-radius:0.2rem;
                           }
-                       }
+                       }                       
+                   }
+                   .food_pay{
+                        position:relative;
+                        display:block;
+                        @include wh(100%,2rem);
+                        padding-top:0.5rem;
                        .food_detail_price{
-                          height:2.4rem;
-                          line-height:2.4rem;
-                          @include fontstyle2(1.1rem,$orange,600);
+                            display:inline-block;
+                            @include fontstyle2(1.2rem,$orange,500);
                        }
                        .order_type{
-                          position:absolute;
-                          bottom:0;
-                          right:0;
-                          text-align:center;
-                          line-height:2.4rem;
-                          @include wh(50%,2.4rem);
+                            text-align:center;
+                            padding:0 0.2rem 0 0;
+                            float:right;
+                            display:inline-block;
                        }
                    }
                }
@@ -896,5 +947,46 @@ width:100%;
    @include wh(100%,100%);
    z-index:70;
    background:rgba(10,10,10,0.3);
+}
+.active_page{
+   position:absolute;
+   top:10.5rem;
+   overflow-y:auto;
+   @include wh(100%,100%);
+   background:$white;
+   padding:3rem .8rem;
+   h1{
+     @include fontstyle2(1.1rem,$black,600);
+     padding:.8rem 0 0 0;
+   }
+   p:nth-of-type(1){
+     padding:.5rem 0;
+     @include fontstyle2(.9rem,$grew1,500);
+   }
+   p:nth-of-type(2){
+     padding:.5rem 0;
+     span{
+        padding:0.2rem 0.5rem;
+        margin:0.2rem;
+        border:0.03rem solid $black;
+        border-radius:1.5rem;
+     }
+   }
+   p:nth-of-type(3){
+     margin:0.3rem 0;
+     @include fontstyle2(.9rem,$grew1,500);
+   }
+   p:nth-of-type(4){
+     margin:0.3rem 0;
+     @include fontstyle2(.9rem,$grew1,500);
+   }
+   p:nth-of-type(5){
+     margin:0.3rem 0;
+     @include fontstyle2(.9rem,$grew1,500);
+   }
+   p:nth-of-type(6){
+     margin:0.3rem 0;
+     @include fontstyle2(.9rem,$grew1,500);
+   }
 }
 </style>

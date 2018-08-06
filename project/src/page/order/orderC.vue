@@ -3,7 +3,7 @@
           <section v-if="!food.specifications.length" class="btn">
                <transition name="showReduce">
                      <span class="btn_" v-if="foodNum" @click="minusCart(food.category_id, food.item_id, food.specfoods[0].food_id)">
-                        <svg style="fill:#7A8185;width:1.2rem;height:1.2rem;">
+                        <svg style="fill:#7A8185;width:1rem;height:1rem;">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                         </svg>
                      </span>
@@ -12,7 +12,7 @@
                      <span class="foodnum" v-if="foodNum">{{foodNum}}</span>
                </transition>
                <span class="btn_" @click="addCart(food.category_id,food.item_id,food.specfoods[0].food_id,food.specfoods[0].name,food.specfoods[0].price,'',food.specfoods[0].packing_fee,food.specfoods[0].sku_id,food.specfoods[0].stock,$event)">
-               <svg class="add_icon" style="fill:#FFCC54;width:1.2rem;height:1.2rem;">
+               <svg class="add_icon" style="fill:#FFCC54;width:1rem;height:1rem;">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
                </svg>
                </span>
@@ -21,7 +21,7 @@
                <div class=" ">
                     <transition name="showReduce">
                      <span class="" v-if="foodNum" @click="minusChooseType">
-                        <svg style="fill:#7A8185;width:1.2rem;height:1.2rem;">
+                        <svg style="fill:#7A8185;width:1rem;height:1rem;">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                         </svg>
                      </span>
@@ -94,6 +94,9 @@ export default{
 <style lang='scss' scoped> 
 @import '../../style/mixin.scss';
 .list_card{
+   .btn{
+       margin-right:0.3rem;
+   }
 }
 .foodnum{
 	margin-top:-0.5rem;
@@ -103,7 +106,7 @@ export default{
   .choose_type_name{
         display:inline-block;
         line-height:1.6rem;
-        @include wh(3.6rem,1.6rem);
+        @include wh(3.2rem,1.6rem);
         background-color:$orange1;
         border-radius:0.5rem;
         @include fontstyle2(0.85rem,$black,600);

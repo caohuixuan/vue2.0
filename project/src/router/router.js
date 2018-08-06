@@ -7,6 +7,7 @@ const mHome=r=>require.ensure([],()=>r(require('../page/mHome/mHome.vue')),'mHom
 const searchT=r=>require.ensure([],()=>r(require('../page/searchT/searchT.vue')),'searchT')
 const lists=r=>require.ensure([],()=>r(require('../page/lists/listsContainer.vue')),'lists')
 const myCart=r=>require.ensure([],()=>r(require('../page/myCart/myCart.vue')),'myCart')
+const foodDetail=r=>require.ensure([],()=>r(require('../page/food/foodDetail.vue')),'foodDetail')
 
 export default [{
 	path:'/',
@@ -47,6 +48,10 @@ export default [{
 	  {
 	  	path:'/myCart',
 	  	component:myCart
+	  },
+	  {
+	  	path:'/food',
+	  	component:foodDetail
 	  }
 	]
 }]
