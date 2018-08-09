@@ -35,19 +35,18 @@
         <transition name="">
         <section class="container_page">
         <div class="change_nav">
-              <div :class="{actionType:showType=='food'}" @click="showType='food'">
+              <div :class="{actionType:showType=='food'}" @click="changeNav('food')">
                   <span>点菜</span>
               </div>
-              <div :class="{actionType:showType=='pingjia'}" @click="showType='pingjia'">
+              <div :class="{actionType:showType=='pingjia'}" @click="changeNav('pingjia')">
                   <span>评价</span>
               </div>
-              <div :class="{actionType:showType=='shangjia'}" @click="showType='shangjia'">
+              <div :class="{actionType:showType=='shangjia'}" @click="changeNav('shangjia')">
                   <span>商家</span>
               </div>
         </div>
         <transition name="type-choose">
-              <div id="food_T" class="food_T">
-              <section v-show="showType=='food'" class="food_page">
+              <section id="food_T" v-show="showType=='food'" class="food_page">
                   <div class="food_menu_l" id="menu_l" ref="menu_l">
                        <ul>
                            <li v-for="(item,index) in menuList" class="food_menu_li" :class="{actionMenu:index==menuIndex}" @click="chooseMenu(index)">
@@ -102,11 +101,95 @@
                              <span>￥{{allCount}}</span>
                              <div>￥30起送</div>
                              <div class="chapay" v-if='chaPay>0' >还差{{chaPay}}</div>
-                             <router-link :to="{path:'/myCart'}" tag="div" class="goPay">去结算</router-link>
+                             <router-link :to="{path:'/myCart',query:{shopid,myPoint,resdetail}}" tag="div" class="goPay">去结算</router-link>
                        </div>
                </section>
-             </section>   
-             </div>
+             </section>             
+        </transition>
+        <transition name="type-choose">
+              <section id="pingjia_T" v-show="showType=='pingjia'" class="pingjia_page">
+                  <section v-load-more="loadMorePingjia"  v-if='getres' class="pingjia_contianer">
+                      <div>
+                           <header class="pingjia_header">
+                                <div class="header_left">
+                                    <p>{{resdetail.rating}}</p>
+                                    <p>商家评分</p>
+                                </div>
+                                <div class="header_middle">
+                                    <p>
+                                       <span>口味</span>
+                                       <rating-start class="shop_start" :rating="shopRating.food_score"></rating-start>
+                                       <span>{{shopRating.food_score.toFixed(1)}}</span>
+                                    </p>
+                                    <p>
+                                       <span>包装</span>
+                                       <rating-start class="shop_start" :rating="shopRating.service_score"></rating-start>
+                                       <span>{{shopRating.service_score.toFixed(1)}}</span>
+                                    </p>
+                                </div>
+                                <div class="header_right">
+                                    <p>{{(shopRating.compare_rating*100).toFixed(1)}}</p>
+                                    <p>配送满意度</p>  
+                                </div>
+                           </header>
+                           <div class="pingjia_tag">
+                                <ul>
+                                    <li v-for="(item,index) in shopTagLists" :class="{activeTag:index==shopTag}" @click="changeTag(index)">{{item.name}}({{item.count}})</li>
+                                </ul>
+                           </div>
+                           <div class="pingjia_list">
+                                <ul>
+                                    <li class="pingjia_item" v-for="(item,index) in shopRatingLists">
+                                       <div>
+                                          <div class="header_img">
+                                          <img class="touxiang" :src="getImgPath(item.avatar)">  
+                                          </div>
+                                          <header>
+                                                 <div class="header_rating">
+                                                    <p>{{item.username}}</p>
+                                                    <p>
+                                                       <span>评分</span>
+                                                       <rating-start class="header_start" :rating="item.rating_star"></rating-start>
+                                                       <span>{{item.rating_star}}</span>
+                                                    </p>
+                                                 </div>
+                                                 <div class="header_time">{{item.rated_at}}</div>
+                                          </header>
+                                       </div>
+                                          <div class="rating_text">这是自编的评价，因为没有评价文字的参数.这是自编的评价，因为没有评价文字的参数.这是自编的评价，因为没有评价文字的参数.这是自编的评价，因为没有评价文字的参数.这是自编的评价，因为没有评价文字的参数.这是自编的评价，因为没有评价文字的参数</div>
+                                          <ul class="rating_img">
+                                               <li v-for="(imgT,index) in item.item_ratings">
+                                                   <img :src="getImgPath(imgT.image_hash)" v-if="imgT.image_hash">  
+                                               </li>
+                                          </ul>
+                                          <ul class="rating_type">
+                                            <li v-for="(nameT, index) in item.item_ratings" >
+                                                {{nameT.food_name}}
+                                            </li>
+                                          </ul>
+                                    </li>
+                                </ul>
+                           </div>
+                      </div>
+                  </section>
+              </section>
+        </transition>
+        <transition name="type-choose">
+              <section id="shangjia_T" v-show="showType=='shangjia'" class="shangjia_page">
+                  <section v-if='getres' class="shangjia_contianer">
+                      <div class="shop_one">
+                         <p><img src="../../images/local.svg"><span>{{resdetail.address}}</span></p>
+                         <p><img src="../../images/type.svg"><span>{{resdetail.category}}</span></p>
+                      </div>
+                      <div class="shop_two">
+                         <p><img src="../../images/pay.svg"><span>{{resdetail.piecewise_agent_fee.tips}}</span></p>
+                         <p><img src="../../images/time.svg"><span>{{resdetail.opening_hours[0]}}</span></p>
+                      </div>
+                      <div class="shop_three">
+                        <p><img src="../../images/gonggao.svg"><span>{{resdetail.phone}}</span></p>
+                      </div>
+                  </section>
+              </section>
         </transition>
         </section>
         </transition>
@@ -203,10 +286,11 @@
 <script>
 import {mapState,mapMutations} from 'vuex';
 import loading from '../../components/common/loading1.vue';
-import orderC from '../order/orderC.vue';
+import orderC from '../order/orderC.vue'
+import ratingStart from '../../components/common/ratingStart.vue';;
 import {msiteAddress,shopList, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags} from '../../service/getData.js'
 import {imgBaseUrl} from '../../config/env.js';
-import {getImgPath} from '../../components/common/loadermore.js'
+import {getImgPath,loadMore} from '../../components/common/loadermore.js'
 import BScroll from 'better-scroll';
 export default{
 	name:'listContainer',
@@ -234,6 +318,13 @@ export default{
           showCartListTip:false,//是否展示购物车列表
           cartList:[],//购物车列表信息
           showActTip:false,//是否显示活动页面
+          shopRating:null,//店铺评论情况
+          shopRatingLists:null,//评论列表
+          ratingOffset:0,//评论索引开始值
+          shopTagLists:null,//店铺评论tag列表
+          shopTag:0,//tag选择序号
+          shopTagName:'',//tag名称
+          preventRepeatRequest: false,// 防止多次触发数据请求
       }
 	},
 	watch:{
@@ -247,7 +338,7 @@ export default{
 	    },
 	    
 	},
-	components:{loading,orderC},
+	components:{loading,orderC,ratingStart},
 	computed:{
         ...mapState(['myCard']),
         resmessage:function(){
@@ -278,9 +369,15 @@ export default{
         chaPay:function(){
            let a=35;
            return (a-this.allCount);
-        }
+        },
+
 	},
-	mixins:[getImgPath],
+	mixins:[getImgPath,loadMore],
+  created(){
+      //console.log(this.$route.query);
+      this.myPoint=this.$route.query.point;
+      this.shopid=this.$route.query.id;  
+  },
 	mounted(){
 	    this.init();
 	},
@@ -291,15 +388,23 @@ export default{
 	    async init(){
 	    const lineheight=document.documentElement.clientHeight;
       document.getElementById('food_T').style.height=(lineheight*0.0625-18.9)+'rem';
-	    this.myPoint=this.$route.query.point;
-	    this.shopid=this.$route.query.id;  
+      document.getElementById('pingjia_T').style.height=(lineheight*0.0625-14.9)+'rem';
+      document.getElementById('shangjia_T').style.height=(lineheight*0.0625-14.9)+'rem';
+      //获取店铺信息
 	    let thisres=await shopDetails(this.shopid,this.myPoint.latLng.lat,this.myPoint.latLng.lng);
 	    this.resdetail=thisres;
-      console.log(this.resdetail);
+      //console.log(this.resdetail);
       document.getElementById("bg").style.backgroundImage = "url('"+this.imgBaseUrl+this.resdetail.image_path+"')";  
-              this.actives=true;	    
+              this.actives=true;
+      //获取食品列表	    
       this.menuList=await foodMenu(this.shopid);
-        //console.log(this.menuList);
+      //获取店铺评论详情
+      this.shopRating=await ratingScores(this.shopid);
+      //获取评论列表
+      this.shopRatingLists=await getRatingList(this.shopid, this.ratingOffset); 
+      //console.log(this.shopRatingLists);
+      //获取评论tag列表
+      this.shopTagLists=await ratingTags(this.shopid);
 	    this.getres=true;
 	    this.showLoading=false; 
 	    },
@@ -439,10 +544,32 @@ export default{
           //console.log(this.showActTip);
       },
       showDetail(food){
-         console.log(food);
+       // console.log(food);
          let shopId=this.shopid;
          let mypoint=this.myPoint;
          this.$router.push({path:'/food',query:{food,shopId,mypoint}})
+      },
+      changeNav(nav){
+         this.showType=nav;
+      },
+      async loadMorePingjia(){
+         //  console.log("a");
+           if(this.preventRepeatRequest){
+               return;
+           }
+           this.showLoading=true;
+           this.preventRepeatRequest=true;
+           this.ratingOffset+=10;
+           let moreRatingList=await getRatingList(this.shopid, this.ratingOffset, this.shopTagName);
+           this.shopRatingLists=[...this.shopRatingLists,...moreRatingList];
+           this.showLoading=false;
+           if (moreRatingList.length >= 10) {
+                    this.preventRepeatRequest = false;
+           }
+
+      },
+      changeTag(index){
+        this.shopTag=index;
       }
 	}
 
@@ -603,15 +730,12 @@ export default{
          border-bottom:0.2rem solid $orange;
     }
 }
-.food_T{
-position:relative;
-top:14.9rem;
-width:100%;
+
 .food_page{
    position:relative;
-   @include wh(100%,100%); 
+   top:14.9rem;
+   width:100%;
    overflow:hidden;
-   
    display:flex;
 	.food_menu_l{
         flex:1;
@@ -716,6 +840,209 @@ width:100%;
         }
 	}
 }
+.pingjia_page{
+   width:100%;
+   position:relative;
+   top:14.9rem;
+   overflow-x:hidden;
+   overflow-y:auto;
+   .pingjia_contianer{
+       .pingjia_header{
+            @include wh(100%,5rem);
+            background:$white;
+            .header_left{
+                @include wh(25%,4rem);
+                float:left;
+                text-align:center;
+                padding-top:1rem;
+                p:nth-of-type(1){
+                   @include fontstyle2(1.5rem,$orange,600);
+                }
+                p:nth-of-type(2){
+                   @include fontstyle2(.8rem,$grew1,300);
+                }
+            }
+            .header_middle{
+                @include wh(50%,5rem);
+                float:left;
+                p{
+                  span:nth-of-type(1){
+                     @include fontstyle2(.9rem,$grew1,300);
+                  }
+                  span:nth-of-type(2){
+                     @include fontstyle2(.8rem,$orange,300);
+                  }
+                  text-align:center;
+                  @include wh(100%,2.5rem);
+                  line-height:2.5rem;
+                  .shop_start{
+                     display:inline-block;
+                  }
+                }
+            }
+            .header_right{
+                @include wh(24%,3.5rem);
+                float:left;
+                text-align:center;
+                margin-top:.75rem;
+                padding-top:.5rem;
+                border-left:.02rem solid $grew4;
+                p:nth-of-type(1){
+                  @include fontstyle2(1.3rem,$grew1,600);
+                }
+                p:nth-of-type(2){
+                  @include fontstyle2(.8rem,$grew1,300);
+                }
+            }
+       }
+       .pingjia_tag{
+          margin-top:.5rem;
+          width:100%;
+          background:$white;
+          ul{
+             padding:.5rem .8rem;
+             display: flex;
+             flex-wrap: wrap;
+             li{
+               list-style-type:none;
+               margin:.2rem .3rem;
+               padding:.2rem .3rem;
+               background:$grew4;
+               border:.02rem solid $grew4;
+               border-radius:.2rem;
+               @include fontstyle2(.9rem,$grew1,500);
+             }
+             .activeTag{
+               border:.02rem solid $orange;
+               border-radius:.2rem;
+               background:$redp;
+               @include fontstyle2(.9rem,$orange,500);
+             }
+          }
+       }
+       .pingjia_list{
+           background:$white;
+           ul{
+              @include wh(100%,100%);
+              .pingjia_item{
+                  list-style-type:none;
+                  padding:.5rem .8rem;
+                  border-bottom:.02rem solid $grew4;
+                  .header_img{
+                    float:left;
+                    text-align:center;
+                    .touxiang{
+                      @include wh(3rem,3rem);
+                      border-radius:50%;
+                      box-shadow:0rem 0rem 0.5rem #ccc;
+                    }
+                  }
+                  header{
+                      position:relative;
+                      @include wh(100%,3rem);
+                      padding-left:3.8rem;
+                      .header_rating{
+                          p:nth-of-type(1){
+                             height:1.6rem;
+                             line-height:1.6rem;
+                             @include fontstyle2(1rem,$black,600);
+                          }
+                          p:nth-of-type(2){
+                             span:nth-of-type(1){
+                                @include fontstyle2(.9rem,$grew1,400);
+                             }
+                             span:nth-of-type(2){
+                                @include fontstyle2(.8rem,$orange,400);
+                             }
+                             .header_start{
+                                display:inline-block;
+                                margin-left:-.5rem;
+                             }
+                          }
+                      }
+                      .header_time{
+                         position:absolute;
+                         top:.8rem;
+                         right:4rem;
+                         @include fontstyle2(.8rem,$grew1,400);
+                      }
+                  }
+                  .rating_text{
+                      @include fontstyle2(1rem,$black,400);
+                      padding:.5rem .5rem .3rem 3rem;
+                  }
+                  .rating_img{
+                        display:flex;
+                        width:100%;
+                        padding-left:3rem;
+                         li{
+                             list-style-type:none;
+                             margin-right:.5rem;
+                             img{
+                                  @include wh(5rem,5rem);
+                             }
+                         }
+                  }
+                  .rating_type{
+                        @include wh(85%,100%);
+                        display:flex;
+                        flex-wrap:wrap;
+                        margin:.3rem .8rem .5rem 3rem;
+                        li{
+                           max-width:6rem;
+                           overflow:hidden;
+                           white-space:nowrap;
+                           text-overflow:ellipsis;
+                           list-style-type:none;
+                           @include fontstyle2(1rem,$grew1,400);
+                           border:.03rem solid $grew2;
+                           margin:.2rem .2rem;
+                           padding:.1rem .2rem;
+                           border-radius:.2rem;
+                        }
+                  }
+              }
+           }
+       }
+
+   }
+}
+.shangjia_page{
+   width:100%;
+   position:relative;
+   top:14.9rem;
+   overflow-x:hidden;
+   overflow-y:auto;
+   .shangjia_contianer{
+       div{
+          background:$white;
+          margin:.5rem 0;
+          p{
+             position:relative;
+             min-height:4rem;
+             padding:.5rem .8rem;
+             vertical-align: middle;
+             img{
+                display:inline-block; 
+                padding-top:1rem;
+                @include wh(1.8rem,1.8rem);
+             }
+             span{
+               position:absolute;
+               top:50%;
+               transform: translateY(-50%);
+               display:inline-block; 
+               line-height:2rem;
+               padding-left:.8rem;
+               @include fontstyle2(1.2rem,$black,400);
+             }
+          }
+          p:nth-of-type(2){
+             border-top:.02rem solid $grew4;
+             
+          }
+       }
+   }
 }
 .type_cover{
     position:absolute;

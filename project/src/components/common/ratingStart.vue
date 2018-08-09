@@ -19,7 +19,7 @@ export default{
 	name:'ratingStart',
 	props:['rating'],
 	mounted(){
-	    console.log(this.rating);
+	  //  console.log(this.rating);
 	}
 }
 </script>
@@ -29,7 +29,7 @@ export default{
         position: relative;
         top: .2rem;
         left:.8rem;
-        @include wh(6rem, 1rem);
+        @include wh(4rem, .8rem);
         .star_overflow{
             overflow: hidden;
             position: relative;

@@ -1,8 +1,8 @@
 <template>
      <div class="list_card">
-          <section v-if="!food.specifications.length" class="btn">
+          <section v-if="!thisFood.specifications.length" class="btn">
                <transition name="showReduce">
-                     <span class="btn_" v-if="foodNum" @click="minusCart(food.category_id, food.item_id, food.specfoods[0].food_id)">
+                     <span class="btn_" v-if="foodNum" @click="minusCart(thisFood.category_id, thisFood.item_id, thisFood.specfoods[0].food_id)">
                         <svg style="fill:#7A8185;width:1rem;height:1rem;">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                         </svg>
@@ -11,7 +11,7 @@
                <transition name="fade">
                      <span class="foodnum" v-if="foodNum">{{foodNum}}</span>
                </transition>
-               <span class="btn_" @click="addCart(food.category_id,food.item_id,food.specfoods[0].food_id,food.specfoods[0].name,food.specfoods[0].price,'',food.specfoods[0].packing_fee,food.specfoods[0].sku_id,food.specfoods[0].stock,$event)">
+               <span class="btn_" @click="addCart(thisFood.category_id,thisFood.item_id,thisFood.specfoods[0].food_id,thisFood.specfoods[0].name,thisFood.specfoods[0].price,'',thisFood.specfoods[0].packing_fee,thisFood.specfoods[0].sku_id,thisFood.specfoods[0].stock,$event)">
                <svg class="add_icon" style="fill:#FFCC54;width:1rem;height:1rem;">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
                </svg>
@@ -29,7 +29,7 @@
                     <transition name="fade">
                      <span class="foodnum" v-if="foodNum">{{foodNum}}</span>
                     </transition>
-                    <span class="choose_type_name" @click="showChooseType(food)">选规格</span>
+                    <span class="choose_type_name" @click="showChooseType(thisFood)">选规格</span>
                </div>
           </section>
      </div>
@@ -39,19 +39,21 @@ import {mapState,mapMutations} from 'vuex';
 export default{
 	name:'orderC',
 	props:['food','shopid'],
-	mounted(){
-	    //console.log(this.food);
-	},
 	computed:{
 	    ...mapState(['myCard']),
 	    shopCart:function(){
 	        return Object.assign({},this.myCard[this.shopid]);
 	    },
+      thisFood:function(){
+          //console.log(this.food);
+          return this.food;
+      },
 	    foodNum:function(){
 	        //return 3;
-          let category_id = this.food.category_id;
-          let item_id = this.food.item_id;
-          let food_id= this.food.specfoods[0].food_id;
+           //console.log(this.food);
+          let category_id = this.thisFood.category_id;
+          let item_id = this.thisFood.item_id;
+          let food_id= this.thisFood.specfoods[0].food_id;
           if(this.shopCart&&this.shopCart[category_id]&&this.shopCart[category_id][item_id]&&this.shopCart[category_id][item_id][food_id]){
               let num=0;
               Object.values(this.shopCart[category_id][item_id]).forEach((item,index)=>{
