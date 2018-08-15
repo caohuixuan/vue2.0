@@ -48,7 +48,7 @@
         <div class="list_title">- 猜你喜欢 -</div>
         <merch-list v-if="hasList" :myPoint="myPoint"></merch-list>
     </div>
-    <foot-guide :home="true"></foot-guide>
+    <foot-guide :home="true" :point="myPoint"></foot-guide>
 </div>
 </template>
 <script>
@@ -62,7 +62,7 @@ export default{
 	data(){
 	   return{
 	       hasList:false,//成功过去信息后显示
-	       myPoint:null,//传递到merchlist页面的坐标
+	       mypoint:null,//传递到merchlist页面的坐标
 	   }
 	},
 	components:{
@@ -84,15 +84,16 @@ export default{
 	},
 	computed:{
 	   ...mapState([
-          'myCity'
+          'myCity','myPoint'
 	   ])
 	},
 	async beforeMount(){    
+	    //console.log(this.myPoint)
 	    if(!this.$route.query.point){
 	    }else{
-
+     
            this.setPoint(this.$route.query.point);
-           this.myPoint=this.$route.query.point;
+           this.mypoint=this.$route.query.point;
 	        //console.log(this.$route.query.point.latLng.lat);
 	    }
 	    this.hasList=true;

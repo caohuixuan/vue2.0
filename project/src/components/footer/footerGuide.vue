@@ -1,7 +1,7 @@
 <template>
 <div class="footer_one">
      <section id="footer_list">
-          <div @click.prevent="gotoPage({path:'/mHome',quert:{myPoint}})">
+          <div @click="gotoPage({path:'/mHome',query:{myPoint}})">
               <img v-if="home" src='../../images/home_two.svg' />
               <img v-else src='../../images/home_one.svg' />
               <p style="display:none;">使用class判断没有起作用！！！</p>
@@ -27,7 +27,7 @@
               <span v-if="ding" class="mActive">订单</span>
               <span v-else class="unActive">订单</span>
           </div>
-          <div @click="gotoPage({path:'/mHome'})">
+          <div @click="gotoPage({path:'/mine',query:{myPoint}})">
               <img v-if="mine" src='../../images/mine_two.svg' />
               <img v-else src='../../images/mine_one.svg' />
               <span v-if="mine" class="mActive">我的</span>
@@ -49,10 +49,14 @@ export default{
             'myPoint'
         ])
 	},
-    props:['home','fujin','find','ding','mine'],
+    props:['home','fujin','find','ding','mine',],
     methods:{
           gotoPage(p){
+             //console.log(p);
+             if(this.myPoint){
              this.$router.push(p);
+             }
+             
         
           }
     }

@@ -17,7 +17,7 @@
    </div>
    <div class="container_one"  :class="{activeOne:chooseType=='ziqu'}">
         <section class='inputAddress' v-show="chooseType=='waimai'">
-            <div class="address">
+            <div class="address" @click="inAddress()">
                 <span>选择收货地址</span>
                 <svg class="setIcon" width="1.2rem" height="0.7rem" xmlns="http://www.w3.org/2000/svg" version="1.1">
                   <polyline points="0,10 5,5 0,0" style="fill:none;stroke:#B2B2B2;stroke-width:1"/>
@@ -105,17 +105,29 @@
                 <span>在线支付</span>
              </span>
        </div>
-
    </div>
    <transition name="loading"> 
               <loading v-if="showLoading"></loading>
    </transition>
-   <section class="bottom_pay">
+</div>
+<section class="bottom_pay">
         <span>已优惠￥{{manjian}}</span>
         <span>合计￥{{allPay}}</span>
         <span>提交订单</span>
-   </section>
-</div>
+</section>
+<div class="page_cover" v-if="pageCover" @click="changeCover()"></div>
+<transition name="toggle-cart">
+<section class="input_address_page" v-if="inputAddressPage">
+   <header>
+      <span class="close">取消</span>
+      <span>选择收货地址</span>
+   </header>
+   <ul>
+      <li></li>
+   </ul>
+   
+</section>
+</transition>
 </div>
 </template>
 <script>
@@ -138,6 +150,8 @@ export default{
             showLoading:false,//正在加载
             imgBaseUrl,
             manjian:0,//满减优惠
+            pageCover:false,//页面cover背景
+            inputAddressPage:false,//是否显示输入地址小页
 	    }
 	},
 	components:{loading},
@@ -212,6 +226,18 @@ export default{
            })
           //console.log(this.cartList[0]);
           this.showLoading=false;
+	   },
+	   inAddress(){
+	      this.changeCover();
+	      this.inputAddressPage=!this.inputAddressPage;
+	      console.log(this.inputAddressPage);
+	   },
+	   changeCover(){
+	      this.pageCover=!this.pageCover;
+	      this.inputAddressPage=!this.inputAddressPage;  
+	      if(this.inputAddressPage){
+	         this.inputAddressPage=!this.inputAddressPage;
+	      }
 	   }
 	}
 }
@@ -515,7 +541,6 @@ export default{
        bottom:0;
        @include wh(100%,3rem);
        background:$black;
-       margin:0 0 0 -3%;
        display:flex;
        line-height:3rem;
        @include fontstyle2(1rem,$white,500);
@@ -539,5 +564,27 @@ export default{
           text-align:center;
        }
    }
+   .page_cover{
+       position:absolute;
+       top:0;
+       left:0;
+       @include wh(100%,100%); 
+       background:rgba(10,10,10,.2);
+   }
+   .input_address_page{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      min-height:30rem;
+      background:$white;
+      z-index:50;
+   }
+}
+.toggle-cart-enter-active, .toggle-cart-leave-active {
+        transition: all .3s ease-out;
+}
+.toggle-cart-enter, .toggle-cart-leave-active {
+        transform: translateY(100%);
 }
 </style>

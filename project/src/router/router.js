@@ -8,6 +8,8 @@ const searchT=r=>require.ensure([],()=>r(require('../page/searchT/searchT.vue'))
 const lists=r=>require.ensure([],()=>r(require('../page/lists/listsContainer.vue')),'lists')
 const myCart=r=>require.ensure([],()=>r(require('../page/myCart/myCart.vue')),'myCart')
 const foodDetail=r=>require.ensure([],()=>r(require('../page/food/foodDetail.vue')),'foodDetail')
+const mine=r=>require.ensure([],()=>r(require('../page/mine/mine.vue')),'mine')
+const userInfo=r=>require.ensure([],()=>r(require('../page/login/userInfo.vue')),'userInfo')
 
 export default [{
 	path:'/',
@@ -52,6 +54,14 @@ export default [{
 	  {
 	  	path:'/food',
 	  	component:foodDetail
+	  },
+	  {
+	  	path:'/mine',
+	  	component:mine
+	  },
+	  {
+	  	path:'/userInfo',
+	  	component:userInfo
 	  }
 	]
 }]
