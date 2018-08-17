@@ -5,9 +5,10 @@
 </header>
 <div class="mine_container">
     <router-link :to="userInfo&&userInfo.user_id? '/userInfo' : '/login'" tag="div" class="mine_login">      
-          <img v-if="userInfo&&userInfo.user_id" src="">
+          <img v-if="userInfo&&userInfo.user_id" :src="imgBaseUrl+userInfo.avatar">
           <img v-else src="../../images/touxiang.svg">
-          <div class="mine_name">请点击登录</div>
+          <div v-if="userInfo&&userInfo.user_id" class="mine_name">{{userInfo.username}}</div>
+          <div v-else class="mine_name">请点击登录</div>
     </router-link>
     <div class="mine_P">
           <div class="p_one">
@@ -45,8 +46,14 @@
 <script>
 import footGuide from '../../components/footer/footerGuide.vue';
 import {mapState} from 'vuex';
+import {imgBaseUrl} from '../../config/env.js';
 export default{
 	name:'mine',
+  data(){
+     return{
+        imgBaseUrl
+     }
+  },
 	components:{
 	footGuide,
 	},
