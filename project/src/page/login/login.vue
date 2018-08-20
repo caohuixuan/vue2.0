@@ -1,11 +1,11 @@
 <template>
 <div class="login_page">
 <header>
-    <router-link tag='section' class="goback" :to="{path:'/mine'}">
+    <section class="goback" @click="goback()">
         <svg class="goback_icon" width="1.6rem" height="1.6rem" xmlns="http://www.w3.org/2000/svg" version="1.1">
            <polyline points="12,18 4,9 12,0" style="fill:none;stroke:#0EC2AB;stroke-width:2"/>
         </svg>
-    </router-link>
+    </section>
     <span>帮助</span>
 </header>
 <p>欢迎登录mm</p>
@@ -145,16 +145,35 @@ export default{
            }
            //用户名登录
            this.userInfo = await accountLogin(this.name, this.password, this.yancode);
-           console.log(this.userInfo);
+           //console.log(this.userInfo);
            if(!this.userInfo.id){
               this.showAlert = true;
               this.alertText = this.userInfo.message;
               return
            }else{
               this.setUserInfo(this.userInfo);
-              this.$router.go(-1);
+              if(this.$route.query.myPoint){
+                 let myPoint=this.$route.query.myPoint;
+                 let shopid=this.$route.query.shopid;
+                 let resdetail=this.$route.query.resdetail;
+                 this.$router.push({path:'/myCart',query:{shopid,myPoint,resdetail}})
+              }else{
+                 this.$router.go(-1);
+              }
+            
            }
-	   }
+	   },
+     goback(){
+        if(this.$route.query.myPoint){
+            let myPoint=this.$route.query.myPoint;
+            let shopid=this.$route.query.shopid;
+            let resdetail=this.$route.query.resdetail;
+            this.$router.push({path:'/myCart',query:{shopid,myPoint,resdetail}})
+        }else{
+           this.$router.go(-1);
+        }
+        
+     }
 	}
 
 }

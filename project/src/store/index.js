@@ -10,6 +10,7 @@ const state={
 	myCity:'',//所在城市
 	myPoint:null,//搜索的位置
 	myCard:{},//购物车
+	beizhu:'',//备注
 };
 export default new Vuex.Store({
 	state,

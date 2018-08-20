@@ -64,4 +64,7 @@ export default{
                 state.userInfo=user;
         //console.log(state.myPoint);
         },
+        setBeizhu(state,txt){
+              state.beizhu=txt;
+        }
 }

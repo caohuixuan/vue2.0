@@ -10,7 +10,8 @@ const myCart=r=>require.ensure([],()=>r(require('../page/myCart/myCart.vue')),'m
 const foodDetail=r=>require.ensure([],()=>r(require('../page/food/foodDetail.vue')),'foodDetail')
 const mine=r=>require.ensure([],()=>r(require('../page/mine/mine.vue')),'mine')
 const userInfo=r=>require.ensure([],()=>r(require('../page/login/userInfo.vue')),'userInfo')
-
+const addAddress=r=>require.ensure([],()=>r(require('../page/mine/addAddress.vue')),'addAddress')
+const beizhu=r=>require.ensure([],()=>r(require('../page/myCart/beizhu.vue')),'beizhu')
 export default [{
 	path:'/',
 	component:App,
@@ -62,6 +63,14 @@ export default [{
 	  {
 	  	path:'/userInfo',
 	  	component:userInfo
+	  },
+	  {
+	  	path:'/addAddress',
+	  	component:addAddress
+	  },
+	  {
+	  	path:'/beizhu',
+	  	component:beizhu
 	  }
 	]
 }]
