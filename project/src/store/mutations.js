@@ -60,11 +60,14 @@ export default{
         }
         
 	},
-        setUserInfo(state,user){
-                state.userInfo=user;
+    setUserInfo(state,user){
+        state.userInfo=user;
         //console.log(state.myPoint);
-        },
-        setBeizhu(state,txt){
-              state.beizhu=txt;
-        }
+    },
+    setBeizhu(state,txt){
+        state.beizhu=txt;
+    },
+    setOrderDetail(state,res){
+        state.orderDetail=res;
+    }
 }

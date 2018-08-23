@@ -21,7 +21,7 @@
               <span v-if="find" class="mActive">发现</span>
               <span v-else class="unActive">发现</span>
           </div>
-          <div @click="gotoPage({path:'/mHome'})">
+          <div @click="gotoPage({path:'/order'})">
               <img v-if="ding" src='../../images/ding_two.svg' />
               <img v-else src='../../images/ding_one.svg' />
               <span v-if="ding" class="mActive">订单</span>

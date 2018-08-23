@@ -11,6 +11,7 @@ const state={
 	myPoint:null,//搜索的位置
 	myCard:{},//购物车
 	beizhu:'',//备注
+	orderDetail:null,//订单详情
 };
 export default new Vuex.Store({
 	state,

@@ -45,7 +45,7 @@ export default{
 	   },
 	   complate(){
             this.setBeizhu(this.beizhuText);
-            this.goback();
+            this.goback(); 
 	   }
 	}
 }

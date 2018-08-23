@@ -45,7 +45,9 @@
                 </span>
             </div>
         </section>
-        <section v-show="chooseType=='ziqu'">qqq</section>
+        <section class="ziqu" v-show="chooseType=='ziqu'">
+           <div id="mymap"></div>
+        </section>
    </div>
    <div class="container_two" v-if="gettre">
         <header>
@@ -128,7 +130,7 @@
 <section class="bottom_pay">
         <span>已优惠￥{{manjian}}</span>
         <span>合计￥{{allPay}}</span>
-        <span>提交订单</span>
+        <span @click="pushOrder()">提交订单</span>
 </section>
 <div class="page_cover" v-if="pageCover" @click="changeCover()"></div>
 <transition name="toggle-cart">
@@ -185,10 +187,11 @@
      <p @click="changeCover()">取消</p>
 </section>
 </transition>
+<section v-if="tipText" class="tipT">{{tipText}}</section>
 </div>
 </template>
 <script>
-import {msiteAddress,shopList, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags,getAddressList} from '../../service/getData.js';
+import {msiteAddress,shopList, shopDetails, foodMenu, getRatingList, ratingScores, ratingTags,getAddressList,checkout,placeOrders} from '../../service/getData.js';
 import {mapState,mapMutations} from 'vuex';
 import {getImgPath} from '../../components/common/loadermore.js'
 import loading from '../../components/common/loading1.vue';
@@ -221,6 +224,8 @@ export default{
             choosetime:"",//选择的时间
             quehuoPage:false,//是否选择如遇缺货
             quehuotxt:'缺货时电话与我沟通',
+            tipText:'',//提示信息
+            checkoutData: null,//数据返回值检验订单的方法结果
 	    }
 	},
 	components:{loading},
@@ -258,6 +263,102 @@ export default{
 	       this.showLoading=true;
            this.foodLists=await foodMenu(this.shopid);
            this.getFoodList();
+          let newArr = new Array;
+                Object.values(this.shopCart).forEach(categoryItem => {
+                    Object.values(categoryItem).forEach(itemValue=> {
+                        Object.values(itemValue).forEach(item => {
+                            newArr.push({
+                                attrs: [],
+                                extra: {},
+                                id: item.id,
+                                name: item.name,
+                                packing_fee: item.packing_fee,
+                                price: item.price,
+                                quantity: item.num,
+                                sku_id: item.sku_id,
+                                specs: [item.specs],
+                                stock: item.stock,
+                            })
+                        })
+                    })
+                })
+           // console.log(newArr);
+            this.checkoutData = await checkout(this.myPoint.latLng.lat+','+this.myPoint.latLng.lng, [newArr], this.shopid);
+          //  console.log(this.checkoutData);
+           let directions_routes,
+           directions_placemarks = [],
+            directions_labels = [],
+            start_marker,
+            end_marker,
+           route_lines = [],
+            step_line,
+            route_steps = []; 
+           let map = new qq.maps.Map(document.getElementById("mymap"), {
+              center: new qq.maps.LatLng(39.916527,116.397128),
+              mapTypeControl:false,
+               scaleControl:false,
+               zoomControl: false,
+               panControl: false,
+           });
+            
+           let directionsService = new qq.maps.DrivingService({
+            complete : function(response){
+                var start = response.detail.start,
+                    end = response.detail.end;
+
+                start_marker && start_marker.setMap(null); 
+                end_marker && end_marker.setMap(null);
+                clearOverlay(route_lines);
+                
+                start_marker = new qq.maps.Marker({
+                      position: start.latLng,
+                      map: map,
+                      zIndex:1
+                });
+                end_marker = new qq.maps.Marker({
+                      position: end.latLng,
+                      map: map,
+                      zIndex:1
+                });
+               directions_routes = response.detail.routes;
+               var routes_desc=[];
+               //所有可选路线方案
+               for(var i = 0;i < directions_routes.length; i++){
+                    var route = directions_routes[i],
+                        legs = route; 
+                    //调整地图窗口显示所有路线    
+                    map.fitBounds(response.detail.bounds); 
+                    //所有路程信息            
+                    //for(var j = 0 ; j < legs.length; j++){
+                        var steps = legs.steps;
+                        route_steps = steps;
+                        let polyline = new qq.maps.Polyline(
+                            {
+                                path: route.path,
+                                strokeColor: '#3893F9',
+                                strokeWeight: 6,
+                                map: map
+                            }
+                        )  
+                        route_lines.push(polyline);
+  
+                    //}
+               }
+            }
+        })
+           let start_name =[this.myPoint.latLng.lat, this.myPoint.latLng.lng];
+           let end_name = [this.shopdetail.location[1], this.shopdetail.location[0]];
+           let policy = 'LEAST_TIME';
+           directionsService.setLocation("北京");
+           directionsService.setPolicy(qq.maps.DrivingPolicy[policy]);
+           directionsService.search(new qq.maps.LatLng(start_name[0], start_name[1]), 
+           new qq.maps.LatLng(end_name[0], end_name[1]));
+           function clearOverlay(overlays){
+        var overlay;
+        while(overlay = overlays.pop()){
+            overlay.setMap(null);
+        }
+           }
 	   },
 	   getFoodList(){
 	       let listIndex=0;
@@ -321,7 +422,6 @@ export default{
             this.$router.push({path:'/login',query:{shopid,myPoint,resdetail}})
             //this.$router.push({path:'/login'})
         }
-
 	   },
 	   changeCover(){
 	      this.pageCover=!this.pageCover;  
@@ -333,6 +433,9 @@ export default{
         }
         if(this.quehuoPage){
            this.quehuoPage=!this.quehuoPage;
+        }
+        if(this.tipText){
+           this.tipText=!this.tipText;
         }
 	   },
      addAddress(){
@@ -418,7 +521,34 @@ export default{
      },
      changequehuo(txt){
         this.quehuotxt=txt;
-     }     
+     },
+     async pushOrder(){
+        if(this.userInfo && this.userInfo.user_id){
+           if(!this.chooseAddress){
+                this.changeCover();
+                this.tipText="请选择收货地址";
+                return;
+           }
+           //console.log("提交订单");
+           let orderRes = await placeOrders(this.userInfo.user_id, this.checkoutData.cart.id, this.chooseAddress.id, this.beizhu, this.checkoutData.cart.groups, this.myPoint.latLng.lat+','+this.myPoint.latLng.lng, this.checkoutData.sig);
+           console.log(orderRes);
+           if(!orderRes.need_validation){
+               let myPoint=this.$route.query.myPoint;
+               let shopid=this.$route.query.shopid;
+               let resdetail=this.$route.query.resdetail;
+               let allpay=this.allPay;
+               this.$router.push({path:'/payPage',query:{shopid,myPoint,resdetail,allpay}})
+               
+           }
+        }else{
+            // console.log(this.shopdetail.delivery_mode);
+            let myPoint=this.$route.query.myPoint;
+            let shopid=this.$route.query.shopid;
+            let resdetail=this.$route.query.resdetail;
+            this.$router.push({path:'/login',query:{shopid,myPoint,resdetail}})
+            //this.$router.push({path:'/login'})
+        }
+     }    
 	}
 }
 </script>
@@ -571,6 +701,15 @@ export default{
                    transform:translateY(5%);
                 }
              }
+          }
+          .ziqu{
+              @include wh(100%,20rem);
+              #mymap{
+                  @include wh(100%,100%);
+                  .csssprite{
+
+                  }
+              }
           }
        }
        .activeOne{
@@ -910,6 +1049,14 @@ export default{
             line-height:2.5rem;
             border-top:.02rem solid $grew4;
       }
+   }
+   .tipT{
+       @include wh(60%,5rem);
+       background:$white;
+       border-radius:1rem;
+       text-align:center;
+       line-height:5rem;
+       @include juzhong();
    }
 }
 .toggle-cart-enter-active, .toggle-cart-leave-active {
